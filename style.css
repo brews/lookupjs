@@ -13,25 +13,25 @@
 	float: left;
 }
 
-#bigTimelineContainer {
+#timeline-chart {
 	float: left;
 	width: 100%;
 	height: 200px;
 }
 
-#seriesContainer {
+#series-chart {
 	float: left;
 	width: 300px;
 	height: 400px;
 }
 
-#singleResultContainer {
+#shortresult-chart {
 	float: left;
 	width: 150px;
 	height: 400px;
 }
 
-#decadeResultContainer {
+#longresult-chart {
 	float: left;
 	width: 150px;
 	height: 400px;

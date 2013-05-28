@@ -10,17 +10,17 @@
 
 <body>
 	<div id="container">
-		<div id="bigTimelineContainer">
-			bigTimelineContainer
+		<div id="timeline-chart">
+			timeline-chart
 		</div>
-		<div id="seriesContainer">
-			seriesContainer
+		<div id="series-chart">
+			series-chart
 		</div>
-		<div id="singleResultContainer">
-			singleResultContainer
+		<div id="shortresult-chart">
+			shortresult-chart
 		</div>
-		<div id="decadeResultContainer">
-			decadeResultContainer
+		<div id="longresult-chart">
+			longresult-chart
 		</div>
 				<!-- filterform is just a holder until I get a proper filter graphic up -->
 		<div id="filterform">
@@ -72,6 +72,7 @@
 			console.log(error);
 		} else {
 			data.forEach(function(d, index) {
+				// Convert strings to numbers and assign to `dataset`.
 				var dkeys = d3.keys(d);
 				var outgoing = {};
 				for (var i = 0; i < dkeys.length; i++) {
@@ -80,10 +81,15 @@
 				dataset[index] = outgoing;
 			});
 			// Awesome vis code here.
+
 			console.log(dataset); // DEBUG
 		}
 	});
 	console.log(dataset);
+	/////////////////////////////////////////////////////
+	// TODO: Get basic timeline plot with highlighting mechanism then work 
+	//       out the filter design.
+	/////////////////////////////////////////////////////
 
 	</script>
 </body>
