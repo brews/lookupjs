@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<link rel="stylesheet" href="style.css" type="text/css">
+	<title>lookup</title>
+	<script src="d3.v3.min.js", type="text/javascript"></script>
+	<script src="lookup.js" type="text/javascript"></script>
+</head>
+
+<body>
+	<div id="container">
+		<div id="bigTimelineContainer">
+			bigTimelineContainer
+		</div>
+		<div id="seriesContainer">
+			seriesContainer
+		</div>
+		<div id="singleResultContainer">
+			singleResultContainer
+		</div>
+		<div id="decadeResultContainer">
+			decadeResultContainer
+		</div>
+				<!-- filterform is just a holder until I get a proper filter graphic up -->
+		<div id="filterform">
+			<div class="seriesfilterforms">
+				<h3 align="center">Series 1</h3>
+				<form class="filterform">
+	 				<legend>Year 1</legend>
+	 				<p>Minimum: <input name="seriesname1Year1Min" type="number" min="0" max = "10" value="5"></p>
+	 				<p>Maximum: <input name="seriesname1Year1Max" type="number" min="0" max = "10" value="5"></p>
+	 			</form>
+	 			<form class="filterform">
+	 				<legend>Year 2</legend>
+	 				<p>Minimum: <input name="seriesname1Year2Min" type="number" min="0" max = "10" value="5"></p>
+	 				<p>Maximum: <input name="seriesname1Year2Max" type="number" min="0" max = "10" value="5"></p>
+	 			</form>
+	 			<form class="filterform">
+	 				<legend>Year 3</legend>
+	 				<p>Minimum: <input name="seriesname1Year3Min" type="number" min="0" max = "10" value="5"></p>
+	 				<p>Maximum: <input name="seriesname1Year3Max" type="number" min="0" max = "10" value="5"></p>
+	 			</form>
+	 		</div>
+	 		<div class="seriesfilterforms">
+				<h3 align="center">Series 2</h3>
+				<form class="filterform">
+	 				<legend>Year 1</legend>
+	 				<p>Minimum: <input name="seriesname2Year1Min" type="number" min="0" max = "10" value="5"></p>
+	 				<p>Maximum: <input name="seriesname2Year1Max" type="number" min="0" max = "10" value="5"></p>
+	 			</form>
+	 			<form class="filterform">
+	 				<legend>Year 2</legend>
+	 				<p>Minimum: <input name="seriesname2Year2Min" type="number" min="0" max = "10" value="5"></p>
+	 				<p>Maximum: <input name="seriesname2Year2Max" type="number" min="0" max = "10" value="5"></p>
+	 			</form>
+	 			<form class="filterform">
+	 				<legend>Year 3</legend>
+	 				<p>Minimum: <input name="seriesname2Year3Min" type="number" min="0" max = "10" value="5"></p>
+	 				<p>Maximum: <input name="seriesname2Year3Max" type="number" min="0" max = "10" value="5"></p>
+	 			</form>
+	 		</div>
+		</div>
+	</div>
+	<script type="text/javascript">
+
+	var dataset = [];
+
+	d3.csv("riverclimate.csv", function(error, data) {
+		// TODO: Still need some error catching here.
+		if (error) {
+			console.log(error);
+		} else {
+			data.forEach(function(d, index) {
+				var dkeys = d3.keys(d);
+				var outgoing = {};
+				for (var i = 0; i < dkeys.length; i++) {
+					outgoing[dkeys[i]] = +d[dkeys[i]];
+				}
+				dataset[index] = outgoing;
+			});
+			// Awesome vis code here.
+			console.log(dataset); // DEBUG
+		}
+	});
+	console.log(dataset);
+
+	</script>
+</body>
+</html>
