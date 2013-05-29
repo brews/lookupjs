@@ -33,6 +33,14 @@
 	var timelineLeesFerryYAxis = d3.svg.axis();
 	var timelinePNAYAxis = d3.svg.axis();
 
+	function highlightYears(x) {
+		// To highlight obs in an array of years, d, in timeline-chart.
+		d3.selectAll(".lineplotcircle.highlight").attr("class", "lineplot lineplotcircle");
+		d3.selectAll(".lineplotcircle").filter(function(d) { return x.indexOf(d.Year) === -1 ? null : true; })
+			.transition()
+			.attr("class", "lineplot lineplotcircle highlight");
+	}
+
 	d3.csv("riverclimate.csv", function(error, data) {
 		// TODO: Still need some error catching here.
 		if (error) {
@@ -113,14 +121,14 @@
 			.data(dataset)
 			.enter()
 			.append("circle")
-			.attr("class", "lineplot")
+			.attr("class", "lineplot lineplotcircle")
 			.attr("cy", function(d) {
 				return timelineFourRiversYScale(d["FourRivers"]);
 			})
 			.attr("cx", function(d) {
 				return timelineXScale(d["Year"]);
 			})
-			.attr("r", 2)
+			.attr("r", 4)
 			.append("title")
 			.text(function(d) {
 				return d["FourRivers"] + " (" + d["Year"] + ")";
@@ -136,14 +144,14 @@
 			.data(dataset)
 			.enter()
 			.append("circle")
-			.attr("class", "lineplot")
+			.attr("class", "lineplot lineplotcircle")
 			.attr("cy", function(d) {
 				return timelineLeesFerryYScale(d["LeesFerry"]);
 			})
 			.attr("cx", function(d) {
 				return timelineXScale(d["Year"]);
 			})
-			.attr("r", 2)
+			.attr("r", 4)
 			.append("title")
 			.text(function(d) {
 				return d["LeesFerry"] + " (" + d["Year"] + ")";
@@ -159,14 +167,14 @@
 			.data(dataset)
 			.enter()
 			.append("circle")
-			.attr("class", "lineplot")
+			.attr("class", "lineplot lineplotcircle")
 			.attr("cy", function(d) {
 				return timelinePNAYScale(d["PNA"]);
 			})
 			.attr("cx", function(d) {
 				return timelineXScale(d["Year"]);
 			})
-			.attr("r", 2)
+			.attr("r", 4)
 			.append("title")
 			.text(function(d) {
 				return d["PNA"] + " (" + d["Year"] + ")";
