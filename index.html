@@ -17,7 +17,6 @@
 	<script type="text/javascript">
 
 	var dataset = [];
-	var windowpane = {};  // Should have "low" and "high" attributes, assumed to correspond to years in the series.
 	var highlight = []; // To be an array giving years to be highlighted.
 
 	var timelineMargin = {top: 20, right: 50, bottom: 20, left: 50};
@@ -73,43 +72,9 @@
 				.attr("id", "timelineplotspace")
 				.attr("transform", "translate(" + timelineMargin.left + "," + timelineMargin.top + ")");
 
-		function drawWindowPane(obj) {
-			// Draws and updates the timeline's window pane.
-			lowscaled = timelinexScale(windowpane.low);
-			highscaled = timelinexScale(windowpane.high);
-			windowwidth = highscaled - lowscaled;
-			timelineSvg.select(".windowpane")
-				.attr("x", lowscaled)
-				.attr("y", 0)
-				.attr("width", windowwidth)
-				.attr("height", timelineHeight)
-				.attr("class", "windowpane");
-			seriesxScale.domain([windowpane.low, windowpane.high])
-			.range([0, seriesWidth]);
-		}
-
-		// The rect makes it so we can catch mouseup & down events.
-		timelineSvg.select("#timelineplotspace").append("rect")
-				.attr("x", 0)
-				.attr("y", 0)
-				.attr("width", timelineWidth)
-				.attr("height", timelineHeight)
-				.attr("fill", "white")
-				.on("mousedown", function() {
-					x = timelinexScale.invert(d3.event.x - timelineMargin.left);
-					windowpane.low = d3.round(x);
-					drawWindowPane(this);
-				})
-				.on("mouseup", function() {
-					x = timelinexScale.invert(d3.event.x - timelineMargin.left);
-					windowpane.high = d3.round(x);
-					drawWindowPane(this);
-				});
-
 		timelineSvg.select("#timelineplotspace").append("path")
 			.attr("class", "lineplot lineplotpath")
 			.attr("d", timelineLine(dataset));
-
 		timelineSvg.select("#timelineplotspace").selectAll("circle")
 			.data(dataset)
 			.enter()
