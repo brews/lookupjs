@@ -65,6 +65,22 @@
 	<script type="text/javascript">
 
 	var dataset = [];
+	var windowpane = {};  // Should have "low" and "high", assumed to correspond to years in the series.
+
+	// var drag = d3.behavior.drag()
+	// 	.origin(Object)
+	// 	.on("drag", dragwindow);
+
+	// function dragwindow(d) {
+	// 	// d3.select(this)
+	// 	// 	.append("rect")
+	// 	// 	.attr("class", "windowpane")
+	// 	// 	.x(0)
+	// 	// 	.y(x.event)
+	// 	// 	.height()
+	// 	// 	.width();
+	// 	console.log(d3.event)  // DEBUG
+	// }
 
 	var timelineMargin = {top: 20, right: 50, bottom: 20, left: 50};
 	var timelineWidth = 660 - timelineMargin.left - timelineMargin.right;
@@ -111,12 +127,47 @@
 			.x(function(d) { return timelinexScale(d["Year"]); })
 			.y(function(d) { return timelineyScale(d["FourRivers"]); });
 
+		// TODO BUG: timelineSvg is not the SVG element but the <g> within the SVG. Need to correct this.
+
 		var timelineSvg = d3.select("#timeline-chart").append("svg")
 			.attr("width", timelineWidth + timelineMargin.left + timelineMargin.right)
 			.attr("heigh", timelineHeight + timelineMargin.top + timelineMargin.bottom)
 			.append("g")
 				.attr("transform", "translate(" + timelineMargin.left + "," + timelineMargin.top + ")");
 
+		function drawWindowPane(obj) {
+			// Draws and updates the timeline's window pane.
+			lowscaled = timelinexScale(windowpane.low);
+			highscaled = timelinexScale(windowpane.high);
+			windowwidth = highscaled - lowscaled;
+			console.log(windowwidth);  // DEBUG
+			console.log(windowpane);
+			timelineSvg.select(".windowpane")
+				.attr("x", lowscaled)
+				.attr("y", 0)
+				.attr("width", windowwidth)
+				.attr("height", timelineHeight)
+				.attr("class", "windowpane");
+		}
+
+		// The rect makes it so we can catch mouseup & down events.
+		timelineSvg.append("rect")
+				.attr("x", 0)
+				.attr("y", 0)
+				.attr("width", timelineWidth)
+				.attr("height", timelineHeight)
+				.attr("fill", "white")
+				.on("mousedown", function() {
+					x = timelinexScale.invert(d3.event.x - timelineMargin.left);
+					windowpane.low = d3.round(x);
+					drawWindowPane(this);
+				})
+				.on("mouseup", function() {
+					x = timelinexScale.invert(d3.event.x - timelineMargin.left);
+					windowpane.high = d3.round(x);
+					drawWindowPane(this);
+				});
+		// timelineSvg.call(drag);
 		timelineSvg.append("path")
 			.attr("class", "lineplot lineplotpath")
 			.attr("d", timelineLine(dataset));
@@ -145,6 +196,9 @@
 		timelineSvg.append("g")
 			.attr("class", "axis")
 			.call(timelineyAxis);
+
+		timelineSvg.append("rect")
+					.attr("class", "windowpane");
 
 	});
 	console.log(dataset);
