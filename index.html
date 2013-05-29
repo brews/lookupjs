@@ -51,7 +51,6 @@
 		}
 
 		//// Awesome vis code here. //
-
 		// Plotting the timeline.
 		timelineFourRiversYScale.domain([d3.min(dataset, function(d) { return d["FourRivers"]; }),
 								d3.max(dataset, function(d) { return d["FourRivers"]; })])
@@ -96,7 +95,13 @@
 
 		timelineSvg.append("g")
 				.attr("id", "timelineplotspace")
-				.attr("transform", "translate(" + timelineMargin.left + "," + timelineMargin.top + ")");
+				.attr("transform", "translate(" + timelineMargin.left + "," + timelineMargin.top + ")")
+				.append("rect")
+				.attr("cy", 0)
+				.attr("cx", 0)
+				.attr("height", timelineHeight)
+				.attr("width", timelineWidth)
+				.attr("id", "timelinebackgroundrect")
 
 		timelineSvg.select("#timelineplotspace").append("g")
 			.attr("class", "series fourrivers")
@@ -182,7 +187,6 @@
 		timelineSvg.select(".series.pna").append("g")
 			.attr("class", "axis")
 			.call(timelinePNAYAxis);
-
 	});
 	console.log(dataset);
 	</script>
