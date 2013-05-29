@@ -11,76 +11,14 @@
 <body>
 	<div id="container">
 		<div id="timeline-chart">
-			timeline-chart
-		</div>
-		<div id="series-chart">
-			series-chart
-		</div>
-		<div id="shortresult-chart">
-			shortresult-chart
-		</div>
-		<div id="longresult-chart">
-			longresult-chart
-		</div>
-				<!-- filterform is just a holder until I get a proper filter graphic up -->
-		<div id="filterform">
-			<div class="seriesfilterforms">
-				<h3 align="center">Series 1</h3>
-				<form class="filterform">
-	 				<legend>Year 1</legend>
-	 				<p>Minimum: <input name="seriesname1Year1Min" type="number" min="0" max = "10" value="5"></p>
-	 				<p>Maximum: <input name="seriesname1Year1Max" type="number" min="0" max = "10" value="5"></p>
-	 			</form>
-	 			<form class="filterform">
-	 				<legend>Year 2</legend>
-	 				<p>Minimum: <input name="seriesname1Year2Min" type="number" min="0" max = "10" value="5"></p>
-	 				<p>Maximum: <input name="seriesname1Year2Max" type="number" min="0" max = "10" value="5"></p>
-	 			</form>
-	 			<form class="filterform">
-	 				<legend>Year 3</legend>
-	 				<p>Minimum: <input name="seriesname1Year3Min" type="number" min="0" max = "10" value="5"></p>
-	 				<p>Maximum: <input name="seriesname1Year3Max" type="number" min="0" max = "10" value="5"></p>
-	 			</form>
-	 		</div>
-	 		<div class="seriesfilterforms">
-				<h3 align="center">Series 2</h3>
-				<form class="filterform">
-	 				<legend>Year 1</legend>
-	 				<p>Minimum: <input name="seriesname2Year1Min" type="number" min="0" max = "10" value="5"></p>
-	 				<p>Maximum: <input name="seriesname2Year1Max" type="number" min="0" max = "10" value="5"></p>
-	 			</form>
-	 			<form class="filterform">
-	 				<legend>Year 2</legend>
-	 				<p>Minimum: <input name="seriesname2Year2Min" type="number" min="0" max = "10" value="5"></p>
-	 				<p>Maximum: <input name="seriesname2Year2Max" type="number" min="0" max = "10" value="5"></p>
-	 			</form>
-	 			<form class="filterform">
-	 				<legend>Year 3</legend>
-	 				<p>Minimum: <input name="seriesname2Year3Min" type="number" min="0" max = "10" value="5"></p>
-	 				<p>Maximum: <input name="seriesname2Year3Max" type="number" min="0" max = "10" value="5"></p>
-	 			</form>
-	 		</div>
+			<div class="title">timeline-chart</div>
 		</div>
 	</div>
 	<script type="text/javascript">
 
 	var dataset = [];
-	var windowpane = {};  // Should have "low" and "high", assumed to correspond to years in the series.
-
-	// var drag = d3.behavior.drag()
-	// 	.origin(Object)
-	// 	.on("drag", dragwindow);
-
-	// function dragwindow(d) {
-	// 	// d3.select(this)
-	// 	// 	.append("rect")
-	// 	// 	.attr("class", "windowpane")
-	// 	// 	.x(0)
-	// 	// 	.y(x.event)
-	// 	// 	.height()
-	// 	// 	.width();
-	// 	console.log(d3.event)  // DEBUG
-	// }
+	var windowpane = {};  // Should have "low" and "high" attributes, assumed to correspond to years in the series.
+	var highlight = []; // To be an array giving years to be highlighted.
 
 	var timelineMargin = {top: 20, right: 50, bottom: 20, left: 50};
 	var timelineWidth = 660 - timelineMargin.left - timelineMargin.right;
@@ -107,7 +45,7 @@
 		// console.log(dataset); // DEBUG
 		}
 
-		// Awesome vis code here.
+		//// Awesome vis code here. //
 
 		// Plotting the timeline.
 		timelineyScale.domain([d3.min(dataset, function(d) { return d["FourRivers"]; }),
@@ -146,6 +84,8 @@
 				.attr("width", windowwidth)
 				.attr("height", timelineHeight)
 				.attr("class", "windowpane");
+			seriesxScale.domain([windowpane.low, windowpane.high])
+			.range([0, seriesWidth]);
 		}
 
 		// The rect makes it so we can catch mouseup & down events.
@@ -200,11 +140,6 @@
 
 	});
 	console.log(dataset);
-	/////////////////////////////////////////////////////
-	// TODO: Get basic timeline plot with highlighting mechanism then work 
-	//       out the filter design.
-	/////////////////////////////////////////////////////
-
 	</script>
 </body>
 </html>
