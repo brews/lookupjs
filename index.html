@@ -66,11 +66,13 @@
 
 	var dataset = [];
 
-	var timelineMargin = {top: 20, right: 10, bottom: 20, left: 10};
-	var timelineWidth = 960 - timelineMargin.left - timelineMargin.right;
-	var timelineHeight = 500 - timelineMargin.top - timelineMargin.bottom;
+	var timelineMargin = {top: 20, right: 50, bottom: 20, left: 50};
+	var timelineWidth = 660 - timelineMargin.left - timelineMargin.right;
+	var timelineHeight = 300 - timelineMargin.top - timelineMargin.bottom;
 	var timelinexScale = d3.scale.linear();
 	var timelineyScale = d3.scale.linear();
+	var timelinexAxis = d3.svg.axis();
+	var timelineyAxis = d3.svg.axis();
 
 	d3.csv("riverclimate.csv", function(error, data) {
 		// TODO: Still need some error catching here.
@@ -94,27 +96,55 @@
 		// Plotting the timeline.
 		timelineyScale.domain([d3.min(dataset, function(d) { return d["FourRivers"]; }),
 								d3.max(dataset, function(d) { return d["FourRivers"]; })])
-			.range([0, timelineHeight]);
+			.range([timelineHeight, 0]);
 		timelinexScale.domain([d3.min(dataset, function(d) { return d["Year"]; }),
 								d3.max(dataset, function(d) { return d["Year"]; })])
-			.range([timelineWidth, 0]);
+			.range([0, timelineWidth]);
+		timelineyAxis.scale(timelineyScale)
+			.orient("left")
+			.tickFormat(d3.format("d"));
+		timelinexAxis.scale(timelinexScale)
+			.orient("bottom")
+			.tickFormat(d3.format("d"));
+
+		var timelineLine = d3.svg.line() // I think we're going to need this to be global.
+			.x(function(d) { return timelinexScale(d["Year"]); })
+			.y(function(d) { return timelineyScale(d["FourRivers"]); });
 
 		var timelineSvg = d3.select("#timeline-chart").append("svg")
 			.attr("width", timelineWidth + timelineMargin.left + timelineMargin.right)
 			.attr("heigh", timelineHeight + timelineMargin.top + timelineMargin.bottom)
 			.append("g")
 				.attr("transform", "translate(" + timelineMargin.left + "," + timelineMargin.top + ")");
+
+		timelineSvg.append("path")
+			.attr("class", "lineplot lineplotpath")
+			.attr("d", timelineLine(dataset));
+
 		timelineSvg.selectAll("circle")
 			.data(dataset)
 			.enter()
 			.append("circle")
+			.attr("class", "lineplot")
 			.attr("cy", function(d) {
 				return timelineyScale(d["FourRivers"]);
 			})
 			.attr("cx", function(d) {
 				return timelinexScale(d["Year"]);
 			})
-			.attr("r", 1);
+			.attr("r", 2)
+			.append("title")
+			.text(function(d) {
+				return d["FourRivers"] + " (" + d["Year"] + ")";
+			});
+
+		timelineSvg.append("g")
+			.attr("class", "axis")
+			.attr("transform", "translate(0," + timelineHeight + ")")
+			.call(timelinexAxis);
+		timelineSvg.append("g")
+			.attr("class", "axis")
+			.call(timelineyAxis);
 
 	});
 	console.log(dataset);
