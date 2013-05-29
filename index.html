@@ -104,7 +104,7 @@
 				}
 				dataset[index] = outgoing;
 			});
-		console.log(dataset); // DEBUG
+		// console.log(dataset); // DEBUG
 		}
 
 		// Awesome vis code here.
@@ -127,12 +127,12 @@
 			.x(function(d) { return timelinexScale(d["Year"]); })
 			.y(function(d) { return timelineyScale(d["FourRivers"]); });
 
-		// TODO BUG: timelineSvg is not the SVG element but the <g> within the SVG. Need to correct this.
-
 		var timelineSvg = d3.select("#timeline-chart").append("svg")
 			.attr("width", timelineWidth + timelineMargin.left + timelineMargin.right)
 			.attr("heigh", timelineHeight + timelineMargin.top + timelineMargin.bottom)
-			.append("g")
+
+		timelineSvg.append("g")
+				.attr("id", "timelineplotspace")
 				.attr("transform", "translate(" + timelineMargin.left + "," + timelineMargin.top + ")");
 
 		function drawWindowPane(obj) {
@@ -140,8 +140,6 @@
 			lowscaled = timelinexScale(windowpane.low);
 			highscaled = timelinexScale(windowpane.high);
 			windowwidth = highscaled - lowscaled;
-			console.log(windowwidth);  // DEBUG
-			console.log(windowpane);
 			timelineSvg.select(".windowpane")
 				.attr("x", lowscaled)
 				.attr("y", 0)
@@ -151,7 +149,7 @@
 		}
 
 		// The rect makes it so we can catch mouseup & down events.
-		timelineSvg.append("rect")
+		timelineSvg.select("#timelineplotspace").append("rect")
 				.attr("x", 0)
 				.attr("y", 0)
 				.attr("width", timelineWidth)
@@ -167,12 +165,12 @@
 					windowpane.high = d3.round(x);
 					drawWindowPane(this);
 				});
-		// timelineSvg.call(drag);
-		timelineSvg.append("path")
+
+		timelineSvg.select("#timelineplotspace").append("path")
 			.attr("class", "lineplot lineplotpath")
 			.attr("d", timelineLine(dataset));
 
-		timelineSvg.selectAll("circle")
+		timelineSvg.select("#timelineplotspace").selectAll("circle")
 			.data(dataset)
 			.enter()
 			.append("circle")
@@ -189,15 +187,15 @@
 				return d["FourRivers"] + " (" + d["Year"] + ")";
 			});
 
-		timelineSvg.append("g")
+		timelineSvg.select("#timelineplotspace").append("g")
 			.attr("class", "axis")
 			.attr("transform", "translate(0," + timelineHeight + ")")
 			.call(timelinexAxis);
-		timelineSvg.append("g")
+		timelineSvg.select("#timelineplotspace").append("g")
 			.attr("class", "axis")
 			.call(timelineyAxis);
 
-		timelineSvg.append("rect")
+		timelineSvg.select("#timelineplotspace").append("rect")
 					.attr("class", "windowpane");
 
 	});
