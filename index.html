@@ -13,13 +13,21 @@
 		<div id="timeline-chart">
 			<div class="title">timeline-chart</div>
 		</div>
+		<div id="yearhist-chart">
+			<div class="title">yearhist-chart</div>
+		</div>
 	</div>
 	<script type="text/javascript">
 
 	var dataset = [];
+	var binsdata = {};
 	var highlight = []; // To be an array giving years to be highlighted.
 	var seriespadding = 5;  // Padding between each of the plotted time series in timeline.
 	var noseries = 3; // TODO: Number of series we are plotting, this shouldn't be a magic number.
+	// Axis and bin ticks.
+	var fourriversTicks = 5;
+	var leesferryTicks = 7;
+	var pnaTicks = 7;
 
 	var timelineMargin = {top: 20, right: 50, bottom: 20, left: 50};
 	var timelineWidth = 660 - timelineMargin.left - timelineMargin.right;
@@ -75,12 +83,15 @@
 
 		timelineFourRiversYAxis.scale(timelineFourRiversYScale)
 			.orient("left")
+			.ticks(fourriversTicks)
 			.tickFormat(d3.format("d"));
 		timelineLeesFerryYAxis.scale(timelineLeesFerryYScale)
 			.orient("left")
+			.ticks(leesferryTicks)
 			.tickFormat(d3.format("d"));
 		timelinePNAYAxis.scale(timelinePNAYScale)
 			.orient("left")
+			.ticks(pnaTicks)
 			.tickFormat(d3.format("d"));
 
 		timelineXAxis.scale(timelineXScale)
@@ -180,7 +191,6 @@
 				return d["PNA"] + " (" + d["Year"] + ")";
 			});
 
-
 		timelineSvg.select("#timelineplotspace").append("g")
 			.attr("class", "axis")
 			.attr("transform", "translate(0," + timelineHeight + ")")
@@ -195,8 +205,12 @@
 		timelineSvg.select(".series.pna").append("g")
 			.attr("class", "axis")
 			.call(timelinePNAYAxis);
+
+		// Results single-year histogram.
+		yearhistSvg = d3.select("#yearhist-chart").append("svg");
+		
 	});
-	console.log(dataset);
+	// console.log(dataset); // DEBUG
 	</script>
 </body>
 </html>
