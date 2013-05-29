@@ -43,7 +43,7 @@
 	transition: all 0.3s;
 }
 
-circle:hover {
+.lineplotcircle:hover {
 	fill: red;
 	stroke: red;
 	-moz-transition: all 0.3s;
