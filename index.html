@@ -41,6 +41,8 @@
 	var timelineLeesFerryYAxis = d3.svg.axis();
 	var timelinePNAYAxis = d3.svg.axis();
 
+	var previousScale = 1;  // This is so that we can differentiate zoom-panning from the actual zoom and use transitions accordingly in `zoomer()`.
+
 	function highlightYears(x) {
 		// To highlight obs in an array of years, d, in timeline-chart.
 		d3.selectAll(".lineplotcircle.highlight").attr("class", "lineplot lineplotcircle");
@@ -68,18 +70,24 @@
 
 		//// Awesome vis code here. //
 		// Plotting the timeline.
+		var serieschartHeight = timelineHeight / noseries - seriespadding;
 		timelineFourRiversYScale.domain([d3.min(dataset, function(d) { return d["FourRivers"]; }),
 								d3.max(dataset, function(d) { return d["FourRivers"]; })])
-			.range([timelineHeight / noseries - seriespadding, 0]);
+			.range([serieschartHeight, 0]);
 		timelineLeesFerryYScale.domain([d3.min(dataset, function(d) { return d["LeesFerry"]; }),
 								d3.max(dataset, function(d) { return d["LeesFerry"]; })])
-			.range([timelineHeight / noseries - seriespadding, 0]);
+			.range([serieschartHeight, 0]);
 		timelinePNAYScale.domain([d3.min(dataset, function(d) { return d["PNA"]; }),
 								d3.max(dataset, function(d) { return d["PNA"]; })])
-			.range([timelineHeight / noseries - seriespadding, 0]);
+			.range([serieschartHeight, 0]);
 		timelineXScale.domain([d3.min(dataset, function(d) { return d["Year"]; }),
 								d3.max(dataset, function(d) { return d["Year"]; })])
 			.range([0, timelineWidth]);
+
+		var zoom = d3.behavior.zoom()
+			.x(timelineXScale)
+			.scaleExtent([1, Infinity])
+			.on("zoom", zoomer);
 
 		timelineFourRiversYAxis.scale(timelineFourRiversYScale)
 			.orient("left")
@@ -110,29 +118,53 @@
 
 		var timelineSvg = d3.select("#timeline-chart").append("svg")
 			.attr("width", timelineWidth + timelineMargin.left + timelineMargin.right)
-			.attr("heigh", timelineHeight + timelineMargin.top + timelineMargin.bottom)
+			.attr("heigh", timelineHeight + timelineMargin.top + timelineMargin.bottom);
 
 		timelineSvg.append("g")
 				.attr("id", "timelineplotspace")
 				.attr("transform", "translate(" + timelineMargin.left + "," + timelineMargin.top + ")")
+				// .call(zoom)
+				.append("clipPath")
+				.attr("id", "chart-clip")
 				.append("rect")
 				.attr("cy", 0)
 				.attr("cx", 0)
 				.attr("height", timelineHeight)
-				.attr("width", timelineWidth)
-				.attr("id", "timelinebackgroundrect")
+				.attr("width", timelineWidth);
 
 		timelineSvg.select("#timelineplotspace").append("g")
 			.attr("class", "series fourrivers")
-			.attr("transform", "translate(0," + seriespadding / 2 + ")")			
+			.attr("transform", "translate(0," + seriespadding / 2 + ")")
+			.append("g")
+			.attr("class", "series chart");
+		timelineSvg.select("#timelineplotspace").append("g")
+			.attr("class", "series leesferry")
+			.attr("transform", "translate(0," + (timelineHeight / noseries + (seriespadding / 2)) + ")")
+			.append("g")
+			.attr("class", "series chart");
+		timelineSvg.select("#timelineplotspace").append("g")
+			.attr("class", "series pna")
+			.attr("transform", "translate(0," + ((timelineHeight / noseries * 2) + (seriespadding / 2)) + ")")
+			.append("g")
+			.attr("class", "series chart");
+
+		timelineSvg.selectAll(".series.chart")
+			.append("rect")
+			.attr("cy", 0)
+			.attr("cx", 0)
+			.attr("height", serieschartHeight)
+			.attr("width", timelineWidth)
+			.attr("class", "series chart background");
+
+		timelineSvg.select(".series.fourrivers").select(".chart")			
 			.append("path")
-			.attr("class", "lineplot lineplotpath")
+			.attr("class", "lineplot lineplotpath fourrivers")
 			.attr("d", timelineFourRiversLine(dataset));
-		timelineSvg.select(".series.fourrivers").selectAll("circle")
+		timelineSvg.select(".series.fourrivers").select(".chart").selectAll("circle")
 			.data(dataset)
 			.enter()
 			.append("circle")
-			.attr("class", "lineplot lineplotcircle")
+			.attr("class", "lineplot lineplotcircle fourrivers")
 			.attr("cy", function(d) {
 				return timelineFourRiversYScale(d["FourRivers"]);
 			})
@@ -145,17 +177,15 @@
 				return d["FourRivers"] + " (" + d["Year"] + ")";
 			});
 
-		timelineSvg.select("#timelineplotspace").append("g")
-			.attr("class", "series leesferry")
-			.attr("transform", "translate(0," + (timelineHeight / noseries + (seriespadding / 2)) + ")")						
+		timelineSvg.select(".series.leesferry").select(".chart")
 			.append("path")
-			.attr("class", "lineplot lineplotpath")
+			.attr("class", "lineplot lineplotpath leesferry")
 			.attr("d", timelineLeesFerryLine(dataset));
-		timelineSvg.select(".series.leesferry").selectAll("circle")
+		timelineSvg.select(".series.leesferry").select(".chart").selectAll("circle")
 			.data(dataset)
 			.enter()
 			.append("circle")
-			.attr("class", "lineplot lineplotcircle")
+			.attr("class", "lineplot lineplotcircle leesferry")
 			.attr("cy", function(d) {
 				return timelineLeesFerryYScale(d["LeesFerry"]);
 			})
@@ -168,17 +198,15 @@
 				return d["LeesFerry"] + " (" + d["Year"] + ")";
 			});
 
-		timelineSvg.select("#timelineplotspace").append("g")
-			.attr("class", "series pna")
-			.attr("transform", "translate(0," + ((timelineHeight / noseries * 2) + (seriespadding / 2)) + ")")									
+		timelineSvg.select(".series.pna").select(".chart")
 			.append("path")
-			.attr("class", "lineplot lineplotpath")
+			.attr("class", "lineplot lineplotpath pna")
 			.attr("d", timelinePNALine(dataset));
-		timelineSvg.select(".series.pna").selectAll("circle")
+		timelineSvg.select(".series.pna").select(".chart").selectAll("circle")
 			.data(dataset)
 			.enter()
 			.append("circle")
-			.attr("class", "lineplot lineplotcircle")
+			.attr("class", "lineplot lineplotcircle pna")
 			.attr("cy", function(d) {
 				return timelinePNAYScale(d["PNA"]);
 			})
@@ -192,19 +220,68 @@
 			});
 
 		timelineSvg.select("#timelineplotspace").append("g")
-			.attr("class", "axis")
+			.attr("class", "axis x")
 			.attr("transform", "translate(0," + timelineHeight + ")")
 			.call(timelineXAxis);
 
 		timelineSvg.select(".series.fourrivers").append("g")
-			.attr("class", "axis")
+			.attr("class", "axis y")
 			.call(timelineFourRiversYAxis);
 		timelineSvg.select(".series.leesferry").append("g")
-			.attr("class", "axis")
+			.attr("class", "axis y")
 			.call(timelineLeesFerryYAxis);
 		timelineSvg.select(".series.pna").append("g")
-			.attr("class", "axis")
+			.attr("class", "axis y")
 			.call(timelinePNAYAxis);
+
+		timelineSvg.selectAll(".series.chart")
+			.attr("clip-path", "url(#chart-clip)")
+			.call(zoom);
+
+		function zoomer() {
+			// Called when zoom events are triggered. Transitions if zoom, not if panned.
+			durationtime = 200
+			if (d3.event.scale === previousScale) {
+				timelineSvg.select("#timelineplotspace")
+					.select(".axis.x")
+					.call(timelineXAxis);
+				timelineSvg.selectAll(".lineplotcircle")
+					.attr("cx", function(d) {
+						return timelineXScale(d["Year"]);
+					});
+				timelineSvg.select(".lineplotpath.fourrivers")
+					.attr("d", timelineFourRiversLine(dataset));
+				timelineSvg.select(".lineplotpath.leesferry")
+					.attr("d", timelineLeesFerryLine(dataset));
+				timelineSvg.select(".lineplotpath.pna")
+					.attr("d", timelinePNALine(dataset));
+			} else {
+				timelineSvg.select("#timelineplotspace")
+					.select(".axis.x")
+					.transition()
+					.duration(durationtime)
+					.call(timelineXAxis);
+				timelineSvg.selectAll(".lineplotcircle")
+					.transition()
+					.duration(durationtime)
+					.attr("cx", function(d) {
+						return timelineXScale(d["Year"]);
+					});
+				timelineSvg.select(".lineplotpath.fourrivers")
+					.transition()
+					.duration(durationtime)
+					.attr("d", timelineFourRiversLine(dataset));
+				timelineSvg.select(".lineplotpath.leesferry")
+					.transition()
+					.duration(durationtime)
+					.attr("d", timelineLeesFerryLine(dataset));
+				timelineSvg.select(".lineplotpath.pna")
+					.transition()
+					.duration(durationtime)
+					.attr("d", timelinePNALine(dataset));
+			}
+			previousScale = d3.event.scale;
+		}
 
 		// Results single-year histogram.
 		yearhistSvg = d3.select("#yearhist-chart").append("svg");

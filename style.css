@@ -4,36 +4,33 @@
 	width: 600px;
 }
 
-#timeline-chart {
-}
-
-.axis path,
-.axis line {
+svg .axis path,
+svg .axis line {
 	fill: none;
 	stroke: black;
 	shape-rendering: crispEdges;
 }
 
-.axis text {
+svg .axis text {
 	font-family: sans-serif;
 	font-size: 11px;
 }
 
-.lineplot {
+svg .lineplot {
 	stroke: blue;
 	fill: blue;
 	stroke-width: 2;
 }
 
-.lineplotpath {
+svg .lineplotpath {
 	fill: none;
 }
 
-#timelinebackgroundrect {
-	fill: none;
+svg .series.chart.background{
+	fill: white;
 }
 
-.lineplotcircle.highlight {
+svg .lineplotcircle.highlight {
 	fill: orange;
 	stroke: orange;
 	-moz-transition: all 0.3s;
@@ -42,7 +39,7 @@
 	transition: all 0.3s;
 }
 
-.lineplotcircle:hover {
+svg .lineplotcircle:hover {
 	fill: red;
 	stroke: red;
 	-moz-transition: all 0.3s;
