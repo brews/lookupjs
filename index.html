@@ -86,7 +86,7 @@
 
 		var zoom = d3.behavior.zoom()
 			.x(timelineXScale)
-			.scaleExtent([1, Infinity])
+			.scaleExtent([1, 8])
 			.on("zoom", zoomer);
 
 		timelineFourRiversYAxis.scale(timelineFourRiversYScale)
@@ -240,8 +240,13 @@
 
 		function zoomer() {
 			// Called when zoom events are triggered. Transitions if zoom, not if panned.
-			durationtime = 200
-			if (d3.event.scale === previousScale) {
+			console.log(d3.event.scale);  // DEBUG
+			durationtime = 200;
+			var t = d3.event.translate;
+			var s = d3.event.scale;
+			t[0] = Math.min(0, Math.max(timelineWidth * (1 - s), t[0]));			
+			zoom.translate(t);
+			if (s == previousScale) {
 				timelineSvg.select("#timelineplotspace")
 					.select(".axis.x")
 					.call(timelineXAxis);
