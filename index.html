@@ -343,6 +343,59 @@
 			.attr("width", filterWidth)
 			.attr("class", "filter chart background");
 
+		// Adding the connecting line between circles for the filters chart.
+		filterSvg.select(".series.fourrivers").select(".chart").selectAll("line")
+			.data(lookup.filters)
+			.enter()
+			.append("line")
+			.attr("class", "filter filterplotline fourrivers")
+			.attr("y1", function(d) {
+				return timelineFourRiversYScale(d["FourRivers"].low);
+			})
+			.attr("x2", function(d) {
+				return filterXScale(d["filterYear"]);
+			})
+			.attr("y2", function(d) {
+				return timelineFourRiversYScale(d["FourRivers"].high);
+			})
+			.attr("x1", function(d) {
+				return filterXScale(d["filterYear"]);
+			});
+		filterSvg.select(".series.leesferry").select(".chart").selectAll("line")
+			.data(lookup.filters)
+			.enter()
+			.append("line")
+			.attr("class", "filter filterplotline leesferry")
+			.attr("y1", function(d) {
+				return timelineLeesFerryYScale(d["LeesFerry"].low);
+			})
+			.attr("x1", function(d) {
+				return filterXScale(d["filterYear"]);
+			})
+			.attr("y2", function(d) {
+				return timelineLeesFerryYScale(d["LeesFerry"].high);
+			})
+			.attr("x2", function(d) {
+				return filterXScale(d["filterYear"]);
+			});
+		filterSvg.select(".series.pna").select(".chart").selectAll("line")
+			.data(lookup.filters)
+			.enter()
+			.append("line")
+			.attr("class", "filter filterplotline pna")
+			.attr("y1", function(d) {
+				return timelinePNAYScale(d["PNA"].low);
+			})
+			.attr("x1", function(d) {
+				return filterXScale(d["filterYear"]);
+			})
+			.attr("y2", function(d) {
+				return timelinePNAYScale(d["PNA"].high);
+			})
+			.attr("x2", function(d) {
+				return filterXScale(d["filterYear"]);
+			});
+
 		// Adding the upper bounds circle for the filters chart.
 		filterSvg.select(".series.fourrivers").select(".chart").selectAll("circle.high")
 			.data(lookup.filters)
@@ -391,7 +444,8 @@
 			.append("title")
 			.text(function(d) {
 				return d["PNA"].high + " (" + d["filterYear"] + ")";
-			});			
+			});
+
 		// Adding the lower bounds circles for the filters chart.
 		filterSvg.select(".series.fourrivers").select(".chart").selectAll("circle.low")
 			.data(lookup.filters)

@@ -16,6 +16,8 @@ svg .axis text {
 	font-size: 11px;
 }
 
+svg .filterplotcircle,
+svg line.filterplotline,
 svg .lineplot {
 	stroke: blue;
 	fill: blue;
