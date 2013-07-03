@@ -66,6 +66,7 @@
 				dataset[index] = outgoing;
 			});
 		// console.log(dataset); // DEBUG
+		lookup.setData(dataset);
 		}
 
 		//// Awesome vis code here. //
@@ -240,7 +241,7 @@
 
 		function zoomer() {
 			// Called when zoom events are triggered. Transitions if zoom, not if panned.
-			console.log(d3.event.scale);  // DEBUG
+			// console.log(d3.event.scale);  // DEBUG
 			durationtime = 200;
 			var t = d3.event.translate;
 			var s = d3.event.scale;
