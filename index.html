@@ -13,6 +13,9 @@
 		<div id="timeline-chart">
 			<div class="title">timeline-chart</div>
 		</div>
+		<div id="filter-chart">
+			<div class="title">filter-chart</div>
+		</div>
 		<div id="yearhist-chart">
 			<div class="title">yearhist-chart</div>
 		</div>
@@ -124,9 +127,8 @@
 		timelineSvg.append("g")
 				.attr("id", "timelineplotspace")
 				.attr("transform", "translate(" + timelineMargin.left + "," + timelineMargin.top + ")")
-				// .call(zoom)
 				.append("clipPath")
-				.attr("id", "chart-clip")
+				.attr("id", "timeline-clip")
 				.append("rect")
 				.attr("cy", 0)
 				.attr("cx", 0)
@@ -236,7 +238,7 @@
 			.call(timelinePNAYAxis);
 
 		timelineSvg.selectAll(".series.chart")
-			.attr("clip-path", "url(#chart-clip)")
+			.attr("clip-path", "url(#timeline-clip)")
 			.call(zoom);
 
 		function zoomer() {
@@ -289,8 +291,184 @@
 			previousScale = d3.event.scale;
 		}
 
+		// Plot for defining filters.
+		var filterMargin = {top: 20, right: 50, bottom: 20, left: 50};
+		var filterWidth = 260 - filterMargin.left - filterMargin.right;
+		var filterHeight = 300 - filterMargin.top - filterMargin.bottom;
+		var filterXScale = d3.scale.linear();
+		var filterXAxis = d3.svg.axis();
+		var filterSvg = d3.select("#filter-chart").append("svg")
+			.attr("width", filterWidth + filterMargin.left + filterMargin.right)
+			.attr("heigh", filterHeight + filterMargin.top + filterMargin.bottom);
+		filterXScale.domain([d3.min(lookup.filters, function(d) { return d["filterYear"]; }),
+								d3.max(lookup.filters, function(d) { return d["filterYear"]; })])
+			.range([0, filterWidth]);
+
+		filterXAxis.scale(filterXScale)
+			.orient("bottom")
+			.tickFormat(d3.format("d"));
+
+		filterSvg.append("g")
+				.attr("id", "filterplotspace")
+				.attr("transform", "translate(" + filterMargin.left + "," + filterMargin.top + ")")
+				.append("clipPath")
+				.attr("id", "filter-clip")
+				.append("rect")
+				.attr("cy", 0)
+				.attr("cx", 0)
+				.attr("height", filterHeight)
+				.attr("width", filterWidth);
+
+		filterSvg.select("#filterplotspace").append("g")
+			.attr("class", "series fourrivers")
+			.attr("transform", "translate(0," + seriespadding / 2 + ")")
+			.append("g")
+			.attr("class", "chart filter");
+		filterSvg.select("#filterplotspace").append("g")
+			.attr("class", "series leesferry")
+			.attr("transform", "translate(0," + (filterHeight / noseries + (seriespadding / 2)) + ")")
+			.append("g")
+			.attr("class", "chart filter");
+		filterSvg.select("#filterplotspace").append("g")
+			.attr("class", "series pna")
+			.attr("transform", "translate(0," + ((filterHeight / noseries * 2) + (seriespadding / 2)) + ")")
+			.append("g")
+			.attr("class", "chart filter");
+
+		filterSvg.selectAll(".filter.chart")
+			.append("rect")
+			.attr("cy", 0)
+			.attr("cx", 0)
+			.attr("height", serieschartHeight)
+			.attr("width", filterWidth)
+			.attr("class", "filter chart background");
+
+		// Adding the upper bounds circle for the filters chart.
+		filterSvg.select(".series.fourrivers").select(".chart").selectAll("circle.high")
+			.data(lookup.filters)
+			.enter()
+			.append("circle")
+			.attr("class", "filter filterplotcircle fourrivers high")
+			.attr("cy", function(d) {
+				return timelineFourRiversYScale(d["FourRivers"].high);
+			})
+			.attr("cx", function(d) {
+				return filterXScale(d["filterYear"]);
+			})
+			.attr("r", 4)
+			.append("title")
+			.text(function(d) {
+				return d["FourRivers"].high + " (" + d["filterYear"] + ")";
+			});
+		filterSvg.select(".series.leesferry").select(".chart").selectAll("circle.high")
+			.data(lookup.filters)
+			.enter()
+			.append("circle")
+			.attr("class", "filter filterplotcircle leesferry high")
+			.attr("cy", function(d) {
+				return timelineLeesFerryYScale(d["LeesFerry"].high);
+			})
+			.attr("cx", function(d) {
+				return filterXScale(d["filterYear"]);
+			})
+			.attr("r", 4)
+			.append("title")
+			.text(function(d) {
+				return d["LeesFerry"].high + " (" + d["filterYear"] + ")";
+			});
+		filterSvg.select(".series.pna").select(".chart").selectAll("circle.high")
+			.data(lookup.filters)
+			.enter()
+			.append("circle")
+			.attr("class", "filter filterplotcircle pna high")
+			.attr("cy", function(d) {
+				return timelinePNAYScale(d["PNA"].high);
+			})
+			.attr("cx", function(d) {
+				return filterXScale(d["filterYear"]);
+			})
+			.attr("r", 4)
+			.append("title")
+			.text(function(d) {
+				return d["PNA"].high + " (" + d["filterYear"] + ")";
+			});			
+		// Adding the lower bounds circles for the filters chart.
+		filterSvg.select(".series.fourrivers").select(".chart").selectAll("circle.low")
+			.data(lookup.filters)
+			.enter()
+			.append("circle")
+			.attr("class", "filter filterplotcircle fourrivers low")
+			.attr("cy", function(d) {
+				return timelineFourRiversYScale(d["FourRivers"].low);
+			})
+			.attr("cx", function(d) {
+				return filterXScale(d["filterYear"]);
+			})
+			.attr("r", 4)
+			.append("title")
+			.text(function(d) {
+				return d["FourRivers"].low + " (" + d["filterYear"] + ")";
+			});
+		filterSvg.select(".series.leesferry").select(".chart").selectAll("circle.low")
+			.data(lookup.filters)
+			.enter()
+			.append("circle")
+			.attr("class", "filter filterplotcircle leesferry low")
+			.attr("cy", function(d) {
+				return timelineLeesFerryYScale(d["LeesFerry"].low);
+			})
+			.attr("cx", function(d) {
+				return filterXScale(d["filterYear"]);
+			})
+			.attr("r", 4)
+			.append("title")
+			.text(function(d) {
+				return d["LeesFerry"].low + " (" + d["filterYear"] + ")";
+			});
+		filterSvg.select(".series.pna").select(".chart").selectAll("circle.low")
+			.data(lookup.filters)
+			.enter()
+			.append("circle")
+			.attr("class", "filter filterplotcircle pna low")
+			.attr("cy", function(d) {
+				return timelinePNAYScale(d["PNA"].low);
+			})
+			.attr("cx", function(d) {
+				return filterXScale(d["filterYear"]);
+			})
+			.attr("r", 4)
+			.append("title")
+			.text(function(d) {
+				return d["PNA"].low + " (" + d["filterYear"] + ")";
+			});
+
+		filterSvg.select("#filterplotspace").append("g")
+			.attr("class", "axis x")
+			.attr("transform", "translate(0," + filterHeight + ")")
+			.call(filterXAxis);
+
+		filterSvg.select(".series.fourrivers").append("g")
+			.attr("class", "axis y")
+			.call(timelineFourRiversYAxis);
+		filterSvg.select(".series.leesferry").append("g")
+			.attr("class", "axis y")
+			.call(timelineLeesFerryYAxis);
+		filterSvg.select(".series.pna").append("g")
+			.attr("class", "axis y")
+			.call(timelinePNAYAxis);
+
+		filterSvg.selectAll(".filter.chart")
+			.attr("clip-path", "url(#filter-clip)")
+			.call(zoom);			
+
 		// Results single-year histogram.
-		yearhistSvg = d3.select("#yearhist-chart").append("svg");
+		var yearhistMargin = {top: 20, right: 50, bottom: 20, left: 50};
+		var yearhistWidth = 260 - yearhistMargin.left - yearhistMargin.right;
+		var yearhistHeight = 300 - yearhistMargin.top - yearhistMargin.bottom;
+		var yearhistXScale = d3.scale.linear();
+		var yearhistSvg = d3.select("#yearhist-chart").append("svg")
+			.attr("width", yearhistWidth + yearhistMargin.left + yearhistMargin.right)
+			.attr("heigh", yearhistHeight + yearhistMargin.top + yearhistMargin.bottom);
 		
 	});
 	// console.log(dataset); // DEBUG

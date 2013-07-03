@@ -26,7 +26,7 @@ svg .lineplotpath {
 	fill: none;
 }
 
-svg .series.chart.background{
+svg .background{
 	fill: white;
 }
 
@@ -39,7 +39,7 @@ svg .lineplotcircle.highlight {
 	transition: all 0.3s;
 }
 
-svg .lineplotcircle:hover {
+svg circle:hover {
 	fill: red;
 	stroke: red;
 	-moz-transition: all 0.3s;
