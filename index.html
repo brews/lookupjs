@@ -54,6 +54,11 @@
 			.attr("class", "lineplot lineplotcircle highlight");
 	}
 
+	function refilter() {
+		// Rerun the lookup filter engine and refresh plots as needed.
+		highlightYears(lookup.filter());
+	}
+
 	d3.csv("riverclimate.csv", function(error, data) {
 		// TODO: Still need some error catching here.
 		if (error) {
@@ -689,6 +694,7 @@
 			} else {
 				alert("Something went wrong with filter dragging.");
 			}
+			refilter();
 		}
 
 		filterSvg.select(".series.fourrivers").append("g")
@@ -714,6 +720,7 @@
 			.attr("heigh", yearhistHeight + yearhistMargin.top + yearhistMargin.bottom);
 		
 	});
+
 	// console.log(dataset); // DEBUG
 	</script>
 </body>

@@ -34,6 +34,12 @@ var lookup = {
 	//    "PNA":        {"high": 0, "low": 0}}];
 	filters: [],
 
+	getFilterLength: function() {
+		// Return the number of years (length) of the filter.
+		// Note that this assumes this.initFilters() has already been run.
+		return this.filters.length;
+	},
+
 	setData: function(x) {
 		// Store a reference to the dataset that will be filtered.
 		this.dataset = x;
@@ -70,7 +76,8 @@ var lookup = {
 	},
 
 	filter: function(filters, firstrun, candidates) {
-		// Filter the dataset based on this.filters. Returns an array of matching years.
+		// Filter the dataset based on this.filters. Returns an array of the 
+		// single years following the matched pattern.
 		firstrun =  typeof firstrun !== 'undefined' ? firstrun : true;
 		candidates =  typeof candidates !== 'undefined' ? candidates : [];
 		if (firstrun) {
