@@ -105,6 +105,11 @@ var lookup = {
 
 	setHighFilter: function(x, series, year) {
 		// Set the high value of a filter given value `x`, the series key and the `filterYear`.
+
+		// TODO: Combine the logic of setHighFilter and setLowFilter into a 
+		// single function and add logic that ensures the high and low values 
+		// stay within the data's range and that `high` cannot be lower than 
+		// `low`, etc...
 		var i;
 		for (i = 0; i < this.filters.length; i += 1) {
 			if (this.filters[i].filterYear === year) {
@@ -115,6 +120,12 @@ var lookup = {
 
 	setLowFilter: function(x, series, year) {
 		// Set the low value of a filter given value `x`, the series key and the `filterYear`.
+
+		// TODO: Combine the logic of setHighFilter and setLowFilter into a 
+		// single function and add logic that ensures the high and low values 
+		// stay within the data's range and that `high` cannot be lower than 
+		// `low`, etc...
+
 		var i;
 		for (i = 0; i < this.filters.length; i += 1) {
 			if (this.filters[i].filterYear === year) {
