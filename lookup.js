@@ -102,4 +102,24 @@ var lookup = {
 		}
 		return this.filter(filters = filters, firstrun = false, candidates = good_match);
 	},
+
+	setHighFilter: function(x, series, year) {
+		// Set the high value of a filter given value `x`, the series key and the `filterYear`.
+		var i;
+		for (i = 0; i < this.filters.length; i += 1) {
+			if (this.filters[i].filterYear === year) {
+				this.filters[i][series].high = x;
+			}
+		}
+	},
+
+	setLowFilter: function(x, series, year) {
+		// Set the low value of a filter given value `x`, the series key and the `filterYear`.
+		var i;
+		for (i = 0; i < this.filters.length; i += 1) {
+			if (this.filters[i].filterYear === year) {
+				this.filters[i][series].low = x;
+			}
+		}
+	},
 };
