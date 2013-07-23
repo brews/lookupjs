@@ -56,6 +56,19 @@ var lookup = {
 		}
 	},
 
+	getMatchArray: function() {
+		// Get an array with objects that give the matching values after applying current filter.
+		var matches = this.filter();
+		var out = [];
+		var i;
+		for (i = 0; i < this.dataset.length; i += 1) {
+			if (matches.indexOf(this.dataset[i].Year) !== -1) {
+				out.push(this.dataset[i]);
+			}
+		}
+		return out;
+	},
+
 	filter: function(filters, firstrun, candidates) {
 		// Filter the dataset based on this.filters. Returns an array of matching years.
 		firstrun =  typeof firstrun !== 'undefined' ? firstrun : true;
@@ -64,7 +77,7 @@ var lookup = {
 			filters = this.filters.slice(0); // Not sure if this will corrupt object attribute.
 			candidates = range(this.dataset.length - filters.length);
 		}
-		console.log({"filters": filters, "candidates": candidates}); // DEBUG
+		// console.log({"filters": filters, "candidates": candidates}); // DEBUG
 		if ((filters.length == 0) || (candidates.length == 0)) {
 			var final = [];
 			var i;
@@ -75,7 +88,7 @@ var lookup = {
 		}
 		var filter_select = filters.shift();
 		var good_match = [];
-		console.log({"filters": filters, "candidates": candidates, "good_match": good_match}); // DEBUG
+		// console.log({"filters": filters, "candidates": candidates, "good_match": good_match}); // DEBUG
 		var i;
 		for (i = 0; i < candidates.length; i += 1) {
 			if ((this.dataset[candidates[i]].FourRivers >= filter_select.FourRivers.low)
