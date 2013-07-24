@@ -22,17 +22,17 @@
 	</div>
 	<script type="text/javascript">
 
-	var yearhistXScale = d3.scale.linear(); // DEBUG
-
 	var dataset = [];
 	var yearhistData = {};
 	var highlight = []; // To be an array giving years to be highlighted.
-	var seriespadding = 5;  // Padding between each of the plotted time series in timeline.
+	var seriespadding = 12;  // Padding between each of the plotted time series in timeline.
 	var noseries = 3; // TODO: Number of series we are plotting, this shouldn't be a magic number.
 	// Axis and bin ticks.
 	var fourriversTicks = 5;
-	var leesferryTicks = 7;
-	var pnaTicks = 7;
+	var leesferryTicks = 5;
+	var pnaTicks = 5;
+	var filterXAxisTicks = 3;
+	// var yearhistXAxisTicks = 3;
 
 	var timelineMargin = {top: 20, right: 50, bottom: 20, left: 50};
 	var timelineWidth = 660 - timelineMargin.left - timelineMargin.right;
@@ -95,10 +95,12 @@
 		var serieschartHeight = timelineHeight / noseries - seriespadding;
 		timelineFourRiversYScale.domain([d3.min(dataset, function(d) { return d["FourRivers"]; }),
 								d3.max(dataset, function(d) { return d["FourRivers"]; })])
-			.range([serieschartHeight, 0]);
+			.range([serieschartHeight, 0])
+			.nice(fourriversTicks);
 		timelineLeesFerryYScale.domain([d3.min(dataset, function(d) { return d["LeesFerry"]; }),
 								d3.max(dataset, function(d) { return d["LeesFerry"]; })])
-			.range([serieschartHeight, 0]);
+			.range([serieschartHeight, 0])
+			.nice(leesferryTicks);
 		timelinePNAYScale.domain([d3.min(dataset, function(d) { return d["PNA"]; }),
 								d3.max(dataset, function(d) { return d["PNA"]; })])
 			.range([serieschartHeight, 0]);
@@ -325,9 +327,11 @@
 			.attr("heigh", filterHeight + filterMargin.top + filterMargin.bottom);
 		filterXScale.domain([d3.min(lookup.filters, function(d) { return d["filterYear"]; }),
 								d3.max(lookup.filters, function(d) { return d["filterYear"]; })])
-			.range([0, filterWidth]);
+			.range([0, filterWidth])
+			.nice(filterXAxisTicks);
 
 		filterXAxis.scale(filterXScale)
+			.ticks(filterXAxisTicks)
 			.orient("bottom")
 			.tickFormat(d3.format("d"));
 
@@ -722,7 +726,8 @@
 			.attr("heigh", yearhistHeight + yearhistMargin.top + yearhistMargin.bottom);
 		var yearhistXAxis = d3.svg.axis();
 		yearhistXScale.domain([0, lookup.dataset.length])
-			          .range([0, yearhistWidth]);
+			          .range([0, yearhistWidth])
+			          .nice();
 
 		yearhistXAxis.scale(yearhistXScale)
 			.orient("bottom")

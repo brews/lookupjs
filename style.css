@@ -6,9 +6,9 @@
 
 svg .axis path,
 svg .axis line {
-	fill: none;
-	stroke: black;
 	shape-rendering: crispEdges;
+	fill: none;
+	stroke: #262626;
 }
 
 svg .axis text {
@@ -19,14 +19,15 @@ svg .axis text {
 svg .filterplotcircle,
 svg line.filterplotline,
 svg .lineplot {
-	stroke: blue;
-	fill: blue;
+	stroke: steelblue;
+	fill: steelblue;
 	stroke-width: 2;
 }
 
 svg rect.yearhistplotrect {
+	shape-rendering: crispEdges;	
 	stroke: white;
-	fill: blue;
+	fill: steelblue;
 	stroke-width: 1;
 
 }
@@ -51,7 +52,6 @@ svg .highlight {
 
 svg rect.yearhistplotrect:hover {
 	fill: red;
-	stroke: red;
 	-moz-transition: all 0.3s;
 	-o-transition: all 0.3s;
 	-webkit-transition: all 0.3s;
