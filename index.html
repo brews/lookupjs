@@ -72,7 +72,7 @@
 			(dataset.map(function(d) { return d.PNA; }));
 	}
 
-	d3.csv("riverclimate.csv", function(error, data) {
+	d3.csv("riverclimate.json", function(error, data) {
 		// TODO: Still need some error catching here.
 		if (error) {
 			console.log(error);
