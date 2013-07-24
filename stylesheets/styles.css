@@ -254,16 +254,16 @@ footer {
   }
 }
 
-#container {
-	float: left;
-	width: 600px;
-	height: 325px;
-}
+/*#container {*/
+/*	float: left;*/
+/*	width: 600px;*/
+/*	height: 325px;*/
+/*}*/
 
-#filter-chart,
-#yearhist-chart {
-	width: 350px;
-}
+/*#filter-chart,*/
+/*#yearhist-chart {*/
+/*	width: 350px;*/
+/*}*/
 
 svg .axis path,
 svg .axis line {
