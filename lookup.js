@@ -63,7 +63,8 @@ var lookup = {
 	},
 
 	getMatchArray: function() {
-		// Get an array with objects that give the matching values after applying current filter.
+		// Get an array with objects that give the target values after applying current filter.
+		// Note that this is not the year matched by the filters but the following year.
 		var matches = this.filter();
 		var out = [];
 		var i;

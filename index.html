@@ -22,8 +22,10 @@
 	</div>
 	<script type="text/javascript">
 
+	var yearhistXScale = d3.scale.linear(); // DEBUG
+
 	var dataset = [];
-	var binsdata = {};
+	var yearhistData = {};
 	var highlight = []; // To be an array giving years to be highlighted.
 	var seriespadding = 5;  // Padding between each of the plotted time series in timeline.
 	var noseries = 3; // TODO: Number of series we are plotting, this shouldn't be a magic number.
@@ -54,9 +56,20 @@
 			.attr("class", "lineplot lineplotcircle highlight");
 	}
 
-	function refilter() {
-		// Rerun the lookup filter engine and refresh plots as needed.
-		highlightYears(lookup.filter());
+	function initYearhistData() {
+		// Initialize the YearHistData object before a filter has actually been created.
+		// yearhistData.FourRivers = [];
+		// yearhistData.LeesFerry = [];
+		// yearhistData.PNA = [];
+		yearhistData.FourRivers = d3.layout.histogram()
+			.bins(timelineFourRiversYScale.ticks(fourriversTicks))
+			(dataset.map(function(d) { return d.FourRivers; }));
+		yearhistData.LeesFerry = d3.layout.histogram()
+			.bins(timelineLeesFerryYScale.ticks(leesferryTicks))
+			(dataset.map(function(d) { return d.LeesFerry; }));
+		yearhistData.PNA = d3.layout.histogram()
+			.bins(timelinePNAYScale.ticks(pnaTicks))
+			(dataset.map(function(d) { return d.PNA; }));
 	}
 
 	d3.csv("riverclimate.csv", function(error, data) {
@@ -521,7 +534,6 @@
 				if (d3.select(this).attr("class").indexOf("high") !== -1) {
 					lookup.setHighFilter(timelineFourRiversYScale.invert(parseFloat(d3.event.y)), "FourRivers", d.filterYear);
 					filterSvg.select(".series.fourrivers").select(".chart").selectAll("circle.high")
-						.data(lookup.filters)
 						.attr("cy", function(d) {
 							return timelineFourRiversYScale(d["FourRivers"].high);
 						})
@@ -533,7 +545,6 @@
 							return d["FourRivers"].high + " (" + d["filterYear"] + ")";
 						});
 					filterSvg.select(".series.fourrivers").select(".chart").selectAll("line")
-						.data(lookup.filters)
 						.attr("y1", function(d) {
 							return timelineFourRiversYScale(d["FourRivers"].low);
 						})
@@ -549,7 +560,6 @@
 				} else if (d3.select(this).attr("class").indexOf("low") !== -1) {
 					lookup.setLowFilter(timelineFourRiversYScale.invert(parseFloat(d3.event.y)), "FourRivers", d.filterYear);
 					filterSvg.select(".series.fourrivers").select(".chart").selectAll("circle.low")
-						.data(lookup.filters)
 						.attr("cy", function(d) {
 							return timelineFourRiversYScale(d["FourRivers"].low);
 						})
@@ -561,7 +571,6 @@
 							return d["FourRivers"].low + " (" + d["filterYear"] + ")";
 						});
 					filterSvg.select(".series.fourrivers").select(".chart").selectAll("line")
-						.data(lookup.filters)
 						.attr("y1", function(d) {
 							return timelineFourRiversYScale(d["FourRivers"].low);
 						})
@@ -579,7 +588,6 @@
 				if (d3.select(this).attr("class").indexOf("high") !== -1) {
 					lookup.setHighFilter(timelineLeesFerryYScale.invert(parseFloat(d3.event.y)), "LeesFerry", d.filterYear);
 					filterSvg.select(".series.leesferry").select(".chart").selectAll("circle.high")
-						.data(lookup.filters)
 						.attr("cy", function(d) {
 							return timelineLeesFerryYScale(d["LeesFerry"].high);
 						})
@@ -591,7 +599,6 @@
 							return d["LeesFerry"].high + " (" + d["filterYear"] + ")";
 						});
 					filterSvg.select(".series.leesferry").select(".chart").selectAll("line")
-						.data(lookup.filters)
 						.attr("y1", function(d) {
 							return timelineLeesFerryYScale(d["LeesFerry"].low);
 						})
@@ -607,7 +614,6 @@
 				} else if (d3.select(this).attr("class").indexOf("low") !== -1) {
 					lookup.setLowFilter(timelineLeesFerryYScale.invert(parseFloat(d3.event.y)), "LeesFerry", d.filterYear);
 					filterSvg.select(".series.leesferry").select(".chart").selectAll("circle.low")
-						.data(lookup.filters)
 						.attr("cy", function(d) {
 							return timelineLeesFerryYScale(d["LeesFerry"].low);
 						})
@@ -619,7 +625,6 @@
 							return d["LeesFerry"].low + " (" + d["filterYear"] + ")";
 						});
 					filterSvg.select(".series.leesferry").select(".chart").selectAll("line")
-						.data(lookup.filters)
 						.attr("y1", function(d) {
 							return timelineLeesFerryYScale(d["LeesFerry"].low);
 						})
@@ -637,7 +642,6 @@
 				if (d3.select(this).attr("class").indexOf("high") !== -1) {
 					lookup.setHighFilter(timelinePNAYScale.invert(parseFloat(d3.event.y)), "PNA", d.filterYear);
 					filterSvg.select(".series.pna").select(".chart").selectAll("circle.high")
-						.data(lookup.filters)
 						.attr("cy", function(d) {
 							return timelinePNAYScale(d["PNA"].high);
 						})
@@ -649,7 +653,6 @@
 							return d["PNA"].high + " (" + d["filterYear"] + ")";
 						});
 					filterSvg.select(".series.pna").select(".chart").selectAll("line")
-						.data(lookup.filters)
 						.attr("y1", function(d) {
 							return timelinePNAYScale(d["PNA"].low);
 						})
@@ -665,7 +668,6 @@
 				} else if (d3.select(this).attr("class").indexOf("low") !== -1) {
 					lookup.setLowFilter(timelinePNAYScale.invert(parseFloat(d3.event.y)), "PNA", d.filterYear);
 					filterSvg.select(".series.pna").select(".chart").selectAll("circle.low")
-						.data(lookup.filters)
 						.attr("cy", function(d) {
 							return timelinePNAYScale(d["PNA"].low);
 						})
@@ -677,7 +679,6 @@
 							return d["PNA"].low + " (" + d["filterYear"] + ")";
 						});
 					filterSvg.select(".series.pna").select(".chart").selectAll("line")
-						.data(lookup.filters)
 						.attr("y1", function(d) {
 							return timelinePNAYScale(d["PNA"].low);
 						})
@@ -711,6 +712,7 @@
 			.attr("clip-path", "url(#filter-clip)");
 
 		// Results single-year histogram.
+		initYearhistData();
 		var yearhistMargin = {top: 20, right: 50, bottom: 20, left: 50};
 		var yearhistWidth = 260 - yearhistMargin.left - yearhistMargin.right;
 		var yearhistHeight = 300 - yearhistMargin.top - yearhistMargin.bottom;
@@ -718,7 +720,179 @@
 		var yearhistSvg = d3.select("#yearhist-chart").append("svg")
 			.attr("width", yearhistWidth + yearhistMargin.left + yearhistMargin.right)
 			.attr("heigh", yearhistHeight + yearhistMargin.top + yearhistMargin.bottom);
-		
+		var yearhistXAxis = d3.svg.axis();
+		yearhistXScale.domain([0, lookup.dataset.length])
+			          .range([0, yearhistWidth]);
+
+		yearhistXAxis.scale(yearhistXScale)
+			.orient("bottom")
+			.tickFormat(d3.format("d"));
+
+		yearhistSvg.append("g")
+				.attr("id", "yearhistplotspace")
+				.attr("transform", "translate(" + yearhistMargin.left + "," + yearhistMargin.top + ")")
+				.append("clipPath")
+				.attr("id", "yearhist-clip")
+				.append("rect")
+				.attr("cy", 0)
+				.attr("cx", 0)
+				.attr("height", yearhistHeight)
+				.attr("width", yearhistWidth);
+
+		yearhistSvg.select("#yearhistplotspace").append("g")
+			.attr("class", "series fourrivers")
+			.attr("transform", "translate(0," + seriespadding / 2 + ")")
+			.append("g")
+			.attr("class", "chart yearhist");
+		yearhistSvg.select("#yearhistplotspace").append("g")
+			.attr("class", "series leesferry")
+			.attr("transform", "translate(0," + (yearhistHeight / noseries + (seriespadding / 2)) + ")")
+			.append("g")
+			.attr("class", "chart yearhist");
+		yearhistSvg.select("#yearhistplotspace").append("g")
+			.attr("class", "series pna")
+			.attr("transform", "translate(0," + ((yearhistHeight / noseries * 2) + (seriespadding / 2)) + ")")
+			.append("g")
+			.attr("class", "chart yearhist");
+
+		yearhistSvg.selectAll(".yearhist.chart")
+			.append("rect")
+			.attr("cy", 0)
+			.attr("cx", 0)
+			.attr("height", serieschartHeight)
+			.attr("width", yearhistWidth)
+			.attr("class", "yearhist chart background");
+
+		yearhistSvg.select(".series.fourrivers").select(".chart").selectAll(".bar")
+			.data(yearhistData.FourRivers)
+			.enter()
+			.append("rect")
+			.attr("class", "yearhist yearhistplotrect fourrivers")
+			.attr("y", function(d) { return timelineFourRiversYScale(d.x + d.dx);
+			})			
+			.attr("x", 0)
+			.attr("height", function(d) {
+				return timelineFourRiversYScale(d.x) - timelineFourRiversYScale(d.dx + d.x);
+			})
+			.attr("width", 0)
+			.append("title")
+			.text(function(d) {
+				return d.y + " events (" + d.x + " - " + (d.x + d.dx) + ")";
+			});
+
+
+		yearhistSvg.select(".series.leesferry").select(".chart").selectAll(".bar")
+			.data(yearhistData.LeesFerry)
+			.enter()
+			.append("rect")
+			.attr("class", "yearhist yearhistplotrect leesferry")
+			.attr("y", function(d) { return timelineLeesFerryYScale(d.x + d.dx);
+			})
+			.attr("x", 0)
+			.attr("height", function(d) {
+				return timelineLeesFerryYScale(d.x) - timelineLeesFerryYScale(d.dx + d.x);
+			})
+			.attr("width", 0)
+			.append("title")
+			.text(function(d) {
+				return d.y + " events (" + d.x + " - " + (d.x + d.dx) + ")";
+			});
+
+		yearhistSvg.select(".series.pna").select(".chart").selectAll(".bar")
+			.data(yearhistData.PNA)
+			.enter()
+			.append("rect")
+			.attr("class", "yearhist yearhistplotrect pna")
+			.attr("y", function(d) { return timelinePNAYScale(d.x + d.dx);
+			})
+			.attr("x", 0)
+			.attr("height", function(d) {
+				return timelinePNAYScale(d.x) - timelinePNAYScale(d.dx + d.x);
+			})
+			.attr("width", 0)
+			.append("title")
+			.text(function(d) {
+				return d.y + " events (" + d.x + " - " + (d.x + d.dx) + ")";
+			});
+
+		yearhistSvg.select(".series.fourrivers").append("g")
+			.attr("class", "axis y")
+			.call(timelineFourRiversYAxis);
+		yearhistSvg.select(".series.leesferry").append("g")
+			.attr("class", "axis y")
+			.call(timelineLeesFerryYAxis);
+		yearhistSvg.select(".series.pna").append("g")
+			.attr("class", "axis y")
+			.call(timelinePNAYAxis);
+
+		yearhistSvg.select("#yearhistplotspace").append("g")
+			.attr("class", "axis x")
+			.attr("transform", "translate(0," + yearhistHeight + ")")
+			.call(yearhistXAxis);
+
+		yearhistSvg.selectAll(".filter.chart")
+			.attr("clip-path", "url(#filter-clip)");
+
+		function refreshYearhist(m) {
+			// Refresh the single year histogram given `m`, an array, like 
+			//`lookup.dataset`, which has an object for each target
+			// -not matched- year.
+
+			yearhistData.FourRivers = d3.layout.histogram()
+				.bins(timelineFourRiversYScale.ticks(fourriversTicks))
+				(m.map(function(d) { return d.FourRivers; }));
+			yearhistData.LeesFerry = d3.layout.histogram()
+				.bins(timelineLeesFerryYScale.ticks(leesferryTicks))
+				(m.map(function(d) { return d.LeesFerry; }));
+			yearhistData.PNA = d3.layout.histogram()
+				.bins(timelinePNAYScale.ticks(pnaTicks))
+				(m.map(function(d) { return d.PNA; }));
+
+			// OOoo, sexy.
+			yearhistXScale.domain([0, d3.max([d3.max(yearhistData.FourRivers.map(function(d){return d.y;})),
+                                              d3.max(yearhistData.LeesFerry.map(function(d){return d.y;})),
+                                              d3.max(yearhistData.PNA.map(function(d){return d.y;}))])]);
+
+			yearhistXAxis.scale(yearhistXScale);
+			yearhistSvg.select("#yearhistplotspace").selectAll(".axis.x")
+				.call(yearhistXAxis);
+
+			yearhistSvg.selectAll(".fourrivers.yearhistplotrect")
+				.data(yearhistData.FourRivers)
+				.attr("width", function(d) {
+					return yearhistXScale(d.y);
+				})
+				.select("title")
+				.text(function(d) {
+					return d.y + " events (" + d.x + " to " + (d.x + d.dx) + ")";
+				});
+			yearhistSvg.selectAll(".leesferry.yearhistplotrect")
+				.data(yearhistData.LeesFerry)
+				.attr("width", function(d) {
+					return yearhistXScale(d.y);
+				})
+				.select("title")
+				.text(function(d) {
+					return d.y + " events (" + d.x + " to " + (d.x + d.dx) + ")";
+				});				
+			yearhistSvg.selectAll(".pna.yearhistplotrect")
+				.data(yearhistData.PNA)
+				.attr("width", function(d) {
+					return yearhistXScale(d.y);
+				})
+				.select("title")
+				.text(function(d) {
+					return d.y + " events (" + d.x + " to " + (d.x + d.dx) + ")";
+				});				
+		}
+
+	    function refilter() {
+	    	// Rerun the lookup filter engine and refresh plots as needed.
+	    	var matched = lookup.getMatchArray();
+	    	highlightYears(matched.map(function(d) { return d.Year; }));
+	    	refreshYearhist(matched);
+	    }
+
 	});
 
 	// console.log(dataset); // DEBUG
