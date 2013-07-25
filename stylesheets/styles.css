@@ -261,6 +261,10 @@ footer {
 	float: left;
 }
 
+.charts {
+  display: inline-block;
+}
+
 svg .axis path,
 svg .axis line {
 	shape-rendering: crispEdges;
