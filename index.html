@@ -196,7 +196,7 @@
 
         var timelineSvg = d3.select("#timeline-chart").append("svg")
           .attr("width", timelineWidth + timelineMargin.left + timelineMargin.right)
-          .attr("heigh", timelineHeight + timelineMargin.top + timelineMargin.bottom);
+          .attr("height", timelineHeight + timelineMargin.top + timelineMargin.bottom);
 
         timelineSvg.append("g")
             .attr("id", "timelineplotspace")
@@ -373,7 +373,7 @@
         var filterXAxis = d3.svg.axis();
         var filterSvg = d3.select("#filter-chart").append("svg")
           .attr("width", filterWidth + filterMargin.left + filterMargin.right)
-          .attr("heigh", filterHeight + filterMargin.top + filterMargin.bottom);
+          .attr("height", filterHeight + filterMargin.top + filterMargin.bottom);
         filterXScale.domain([d3.min(lookup.filters, function(d) { return d["filterYear"]; }),
                     d3.max(lookup.filters, function(d) { return d["filterYear"]; })])
           .range([0, filterWidth])
@@ -772,7 +772,7 @@
         var yearhistXScale = d3.scale.linear();
         var yearhistSvg = d3.select("#yearhist-chart").append("svg")
           .attr("width", yearhistWidth + yearhistMargin.left + yearhistMargin.right)
-          .attr("heigh", yearhistHeight + yearhistMargin.top + yearhistMargin.bottom);
+          .attr("height", yearhistHeight + yearhistMargin.top + yearhistMargin.bottom);
         var yearhistXAxis = d3.svg.axis();
         yearhistXScale.domain([0, lookup.dataset.length])
                     .range([0, yearhistWidth])
