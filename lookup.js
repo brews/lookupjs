@@ -124,7 +124,6 @@ Engine.prototype = {
         for (i = 0; i < candidates.length; i += 1) {
             var good_so_far = true;
             for (j in this.var_keys) {
-                // TODO 2013-12-30: I stopped here. We're getting `TypeError: Cannot read property 'low' of undefined` below.
                 if ((this.dataset[candidates[i]][this.var_keys[j]] >= filter_select[this.var_keys[j]]["low"])
                  && (this.dataset[candidates[i]][this.var_keys[j]] <= filter_select[this.var_keys[j]]["high"])) {
                     continue;
