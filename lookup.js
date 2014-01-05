@@ -36,9 +36,58 @@ function Engine(n) {
     // var this.filters = new Array(this.filter_n);  // Not sure this really works.
     this.var_keys = [];  // String array giving variable keys in each dataset object.
     this.time_key = "";  // The key for the observation time in each dataset object.
+    this.plotId = {};
+    this.seriesPlotDimensions = {
+        "margin": {"top": 0,
+                   "right": 0,
+                   "bottom": 0,
+                   "left": 0},
+        "padding": 0,
+        "width": 0,
+        "height": 0,
+    };
+    this.filterPlotDimensions = {
+        "margin": {"top": 0,
+                   "right": 0,
+                   "bottom": 0,
+                   "left": 0},
+        "padding": 0,
+        "width": 0,
+        "height": 0,
+    };
+    this.filterPlotXScale = d3.scale.linear();
+    this.filterPlotXAxis = d3.svg.axis();
+    this.seriesPlotXScale = d3.scale.linear();
+    this.seriesPlotXAxis = d3.svg.axis();
+    this.seriesPlotYScales = {};
+    this.seriesPlotYAxis = {};
+    this.seriesPlotTicks = 5;
+    this.seriesPlotDimensions.circleRadius = 4;
+    this.zoomExtent = [1, 8];
+    this.previousScale = 1;
+    this.drag = d3.behavior.drag();
+    this.drag.on("drag", this.dragger);
 }
 
 Engine.prototype = {
+    setSeriesPlotMargin: function(x) {
+        // Pass in an object with keys "top", "right", "bottom", "left", to integers.
+        this.seriesPlotDimensions.margin = x;
+    },
+
+    setFilterPlotMargin: function(x) {
+        // Pass in an object with keys "top", "right", "bottom", "left", to integers.
+        this.filterPlotDimensions.margin = x;
+    },
+
+    setSeriesPlotPadding: function(x) {
+        this.seriesPlotDimensions.padding = x;
+    },
+
+    setFilterPlotPadding: function(x) {
+        this.filterPlotDimensions.padding = x;
+    },
+
     setData: function(x, timekey) {
         // Store a reference to the dataset that will be filtered.
         //
@@ -61,7 +110,382 @@ Engine.prototype = {
         this.var_keys = variable_keys;
         this.dataset = x;
         this.initFilters();
+        this.initScales();
+        this.initAxis();
     },
+
+    highlight: function(x) {
+        // To highlight obs in an array of years, d, in timeline-chart.
+        var k_time = this.time_key;
+        d3.selectAll(".lineplotcircle.highlight").attr("class", "lineplot lineplotcircle");
+        d3.selectAll(".lineplotcircle").filter(function(d) { return x.indexOf(d[k_time]) === -1 ? null : true; })
+            .transition()
+            .attr("class", "lineplot lineplotcircle highlight");
+    },
+
+    drawPlots: function() {
+        this.drawSeriesPlot();
+        this.drawFilterPlot();
+        // this.drawHistPlot();
+    },
+
+    drawSeriesPlot: function() {
+        this.seriesPlotLines = {};
+        var h = this.seriesPlotDimensions.height / this.var_keys.length - this.seriesPlotDimensions.padding;
+        this.seriesPlotSvg = d3.select(this.plotId.seriesPlot).append("svg")
+            .attr("width", this.seriesPlotDimensions.width + this.seriesPlotDimensions.margin.left + this.seriesPlotDimensions.margin.right)
+            .attr("height", this.seriesPlotDimensions.height + this.seriesPlotDimensions.margin.top + this.seriesPlotDimensions.margin.bottom);
+        this.seriesPlotSvg.append("g")
+            .attr("id", "timelineplotspace")
+            .attr("transform", "translate(" + this.seriesPlotDimensions.margin.left + "," + this.seriesPlotDimensions.margin.top + ")")
+            .append("clipPath")
+            .attr("id", "timeline-clip")
+            .append("rect")
+            .attr("cy", 0)
+            .attr("cx", 0)
+            .attr("height", this.seriesPlotDimensions.height)
+            .attr("width", this.seriesPlotDimensions.width);
+        var halfPadding = this.seriesPlotDimensions.padding / 2;
+        var blockHeight = this.seriesPlotDimensions.height / this.var_keys.length;
+        for (i in this.var_keys) {
+            var k = this.var_keys[i];
+            var k_time = this.time_key;
+            var kScale = this.seriesPlotYScales[k];
+            var xScale = this.seriesPlotXScale;
+            this.seriesPlotLines[k] = d3.svg.line()
+                .x(function(d) { return xScale(d[k_time]); })
+                .y(function(d) { return kScale(d[k]); });
+            this.seriesPlotSvg.select("#timelineplotspace").append("g")
+                .attr("class", "series " + k)
+                .attr("transform", "translate(0, " + ((blockHeight * i) + halfPadding) + ")")
+                .append("g")
+                .attr("class", "series chart")
+                .append("rect")
+                .attr("cy", 0)
+                .attr("cx", 0)
+                .attr("height", h)
+                .attr("width", this.seriesPlotDimensions.width)
+                .attr("class", "series chart background");
+            this.seriesPlotSvg.select(".series." + k).select(".chart")
+                .append("path")
+                .attr("class", "lineplot lineplotpath " + k)
+                .attr("d", this.seriesPlotLines[k](this.dataset));
+            this.seriesPlotSvg.select(".series." + k).select(".chart").selectAll("circle")
+                .data(dataset)
+                .enter()
+                .append("circle")
+                .attr("class", "lineplot lineplotcircle " + k)
+                .attr("cy", function(d) { return kScale(d[k]); })
+                .attr("cx", function(d) { return xScale(d[k_time]); })
+                .attr("r", this.seriesPlotDimensions.circleRadius)
+                .append("title")
+                .text(function(d) { return d[k] + " (" + d[k_time] + ")"; });
+            this.seriesPlotSvg.select(".series." + k).append("g")
+                .attr("class", "axis y")
+                .call(this.seriesPlotYAxis[k]);
+        }
+        this.seriesPlotSvg.select("#timelineplotspace").append("g")
+            .attr("class", "axis x")
+            .attr("transform", "translate(0, " + this.seriesPlotDimensions.height + ")")
+            .call(this.seriesPlotXAxis);
+        this.seriesPlotSvg.selectAll(".series.chart")
+            .attr("clip-path", "url(#timeline-clip)")
+            .call(this.zoom);
+    },
+
+    drawFilterPlot: function() {
+        var h = this.filterPlotDimensions.height / this.var_keys.length - this.filterPlotDimensions.padding;
+        this.filterPlotSvg = d3.select(this.plotId.filterPlot).append("svg")
+            .attr("width", this.filterPlotDimensions.width + this.filterPlotDimensions.margin.left + this.filterPlotDimensions.margin.right)
+            .attr("height", this.filterPlotDimensions.height + this.filterPlotDimensions.margin.top + this.filterPlotDimensions.margin.bottom);
+        this.filterPlotSvg.append("g")
+            .attr("id", "filterplotspace")
+            .attr("transform", "translate(" + this.filterPlotDimensions.margin.left + ", " + this.filterPlotDimensions.margin.top + ")")
+            .append("clipPath")
+            .attr("id", "filter-clip")
+            .append("rect")
+            .attr("cy", 0)
+            .attr("cx", 0)
+            .attr("height", this.filterPlotDimensions.height)
+            .attr("width", this.filterPlotDimensions.width);
+        var halfPadding = this.filterPlotDimensions.padding / 2;
+        var blockHeight = this.filterPlotDimensions.height / this.var_keys.length;
+        for (i in this.var_keys) {
+            var k = this.var_keys[i];
+            var k_time = "filterYear";
+            var kScale = this.seriesPlotYScales[k];
+            var xScale = this.filterPlotXScale;
+            this.filterPlotSvg.select("#filterplotspace").append("g")
+                .attr("class", "series " + k)
+                .attr("transform", "translate(0, " + ((blockHeight * i) + halfPadding) + ")")
+                .append("g")
+                .attr("class", "chart filter")
+                .append("rect")
+                .attr("cy", 0)
+                .attr("cx", 0)
+                .attr("height", h)
+                .attr("width", this.filterPlotDimensions.width)
+                .attr("class", "filter chart background");
+            this.filterPlotSvg.select(".series." + k).select(".chart").selectAll("line")
+                .data(this.filters)
+                .enter()
+                .append("line")
+                .attr("class", "filter filterplotline " + k)
+                .attr("y1", function(d) { return kScale(d[k].low); })
+                .attr("x2", function(d) { return xScale(d[k_time]); })
+                .attr("y2", function(d) { return kScale(d[k].high); })
+                .attr("x1", function(d) { return xScale(d[k_time]); });
+            this.filterPlotSvg.select(".series." + k).select(".chart").selectAll("circle.high")
+                .data(this.filters)
+                .enter()
+                .append("circle")
+                .attr("class", "filter filterplotcircle high" + k)
+                .attr("cy", function(d) { return kScale(d[k].high); })
+                .attr("cx", function(d) { return xScale(d[k_time]); })
+                .attr("r", this.seriesPlotDimensions.circleRadius)
+                .append("title")
+                .text(function(d) { return d[k].high + " (" + d["filterYear"] + ")"; });
+            this.filterPlotSvg.select(".series." + k).select(".chart").selectAll("circle.low")
+                .data(this.filters)
+                .enter()
+                .append("circle")
+                .attr("class", "filter filterplotcircle low" + k)
+                .attr("cy", function(d) { return kScale(d[k].low); })
+                .attr("cx", function(d) { return xScale(d[k_time]); })
+                .attr("r", this.seriesPlotDimensions.circleRadius)
+                .append("title")
+                .text(function(d) { return d[k].low + " (" + d[k_time] + ")"; });
+            this.filterPlotSvg.select(".series." + k).append("g")
+                .attr("class", "axis y")
+                .call(kScale);
+        }
+        this.filterPlotSvg.select("#filterplotspace").append("g")
+            .attr("class", "axis x")
+            .attr("transform", "translate(0, " + this.filterPlotDimensions.height + ")")
+            .call(this.filterPlotXAxis);
+        this.filterPlotSvg.selectAll(".filterplotcircle")
+            .call(this.drag);
+        this.filterPlotSvg.selectAll(".filter.chart")
+            .attr("clip-path", "url(#filter-clip)");
+    },
+
+    drawHistPlot: function() {
+
+    },
+
+    // zoomer: function() {
+        // Called when zoom events are triggered. Transitions if zoom, not if panned.
+        // TODO(sbm): This doesn't quite work yet.
+        // console.log(d3.event.scale);  // DEBUG
+        // var k_time = this.time_key;
+        // var xScale = this.SeriesPlotXScale;
+        // var durationtime = 200;
+        // var t = d3.event.translate;
+        // var s = d3.event.scale;
+        // t[0] = Math.min(0, Math.max(this.seriesPlotDimensions.width * (1 - s), t[0]));            
+        // zoom.translate(t);
+        // if (s == this.previousScale) {
+        //     this.seriesPlotSvg.select("#timelineplotspace")
+        //         .select(".axis.x")
+        //         .call(this.seriesPlotXAxis);
+        //     this.seriesPlotSvg.selectAll(".lineplotcircle")
+        //         .attr("cx", function(d) { return xScale(d[k_time]); });
+        //     for (i in this.var_keys) {
+        //         var k = this.var_keys[i];
+        //         this.seriesPlotSvg.select(".lineplotpath." + k)
+        //             .attr("d", this.seriesPlotLines[k](this.dataset))
+        //     }
+        // } else {
+        //     this.seriesPlotSvg.select("#timelineplotspace")
+        //         .select(".axis.x")
+        //         .transition()
+        //         .duration(durationtime)
+        //         .call(this.seriesPlotXAxis);
+        //     this.seriesPlotSvg.selectAll(".lineplotcircle")
+        //         .transition()
+        //         .duration(durationtime)
+        //         .attr("cx", function(d) { return xScale(d["Year"]); });
+        //     for (i in this.var_keys) {
+        //         var k = this.var_keys[i];
+        //         this.seriesPlotSvg.select(".lineplotpath." + k)
+        //             .transition()
+        //             .duration(durationtime)
+        //             .attr("d", this.seriesPlotLines[k](this.dataset))
+        //     }
+        // }
+        // this.previousScale = s;
+    // },
+
+    // dragger: function(d) {
+        // Called whenever drag events are fired. Intended to work on filterSvg circles.
+        // TODO: Check for which series to return back to is a bit hackish. Consider this when redoing the data design.
+        // if (d3.select(this).attr("class").indexOf("fourrivers") !== -1) {
+        //     if (d3.select(this).attr("class").indexOf("high") !== -1) {
+        //         lookup.setHighFilter(timelineFourRiversYScale.invert(parseFloat(d3.event.y)), "FourRivers", d.filterYear);
+        //         filterSvg.select(".series.fourrivers").select(".chart").selectAll("circle.high")
+        //             .attr("cy", function(d) {
+        //                 return timelineFourRiversYScale(d["FourRivers"].high);
+        //             })
+        //             .attr("cx", function(d) {
+        //                 return filterXScale(d["filterYear"]);
+        //             })
+        //             .select("title")
+        //             .text(function(d) {
+        //                 return d["FourRivers"].high + " (" + d["filterYear"] + ")";
+        //             });
+        //         filterSvg.select(".series.fourrivers").select(".chart").selectAll("line")
+        //             .attr("y1", function(d) {
+        //                 return timelineFourRiversYScale(d["FourRivers"].low);
+        //             })
+        //             .attr("x2", function(d) {
+        //                 return filterXScale(d["filterYear"]);
+        //             })
+        //             .attr("y2", function(d) {
+        //                 return timelineFourRiversYScale(d["FourRivers"].high);
+        //             })
+        //             .attr("x1", function(d) {
+        //                 return filterXScale(d["filterYear"]);
+        //             });
+        //     } else if (d3.select(this).attr("class").indexOf("low") !== -1) {
+        //         lookup.setLowFilter(timelineFourRiversYScale.invert(parseFloat(d3.event.y)), "FourRivers", d.filterYear);
+        //         filterSvg.select(".series.fourrivers").select(".chart").selectAll("circle.low")
+        //             .attr("cy", function(d) {
+        //                 return timelineFourRiversYScale(d["FourRivers"].low);
+        //             })
+        //             .attr("cx", function(d) {
+        //                 return filterXScale(d["filterYear"]);
+        //             })
+        //             .select("title")
+        //             .text(function(d) {
+        //                 return d["FourRivers"].low + " (" + d["filterYear"] + ")";
+        //             });
+        //         filterSvg.select(".series.fourrivers").select(".chart").selectAll("line")
+        //             .attr("y1", function(d) {
+        //                 return timelineFourRiversYScale(d["FourRivers"].low);
+        //             })
+        //             .attr("x2", function(d) {
+        //                 return filterXScale(d["filterYear"]);
+        //             })
+        //             .attr("y2", function(d) {
+        //                 return timelineFourRiversYScale(d["FourRivers"].high);
+        //             })
+        //             .attr("x1", function(d) {
+        //                 return filterXScale(d["filterYear"]);
+        //             });                 
+        //     }
+        // } else if (d3.select(this).attr("class").indexOf("leesferry") !== -1) {
+        //     if (d3.select(this).attr("class").indexOf("high") !== -1) {
+        //         lookup.setHighFilter(timelineLeesFerryYScale.invert(parseFloat(d3.event.y)), "LeesFerry", d.filterYear);
+        //         filterSvg.select(".series.leesferry").select(".chart").selectAll("circle.high")
+        //             .attr("cy", function(d) {
+        //                 return timelineLeesFerryYScale(d["LeesFerry"].high);
+        //             })
+        //             .attr("cx", function(d) {
+        //                 return filterXScale(d["filterYear"]);
+        //             })
+        //             .select("title")
+        //             .text(function(d) {
+        //                 return d["LeesFerry"].high + " (" + d["filterYear"] + ")";
+        //             });
+        //         filterSvg.select(".series.leesferry").select(".chart").selectAll("line")
+        //             .attr("y1", function(d) {
+        //                 return timelineLeesFerryYScale(d["LeesFerry"].low);
+        //             })
+        //             .attr("x2", function(d) {
+        //                 return filterXScale(d["filterYear"]);
+        //             })
+        //             .attr("y2", function(d) {
+        //                 return timelineLeesFerryYScale(d["LeesFerry"].high);
+        //             })
+        //             .attr("x1", function(d) {
+        //                 return filterXScale(d["filterYear"]);
+        //             });
+        //     } else if (d3.select(this).attr("class").indexOf("low") !== -1) {
+        //         lookup.setLowFilter(timelineLeesFerryYScale.invert(parseFloat(d3.event.y)), "LeesFerry", d.filterYear);
+        //         filterSvg.select(".series.leesferry").select(".chart").selectAll("circle.low")
+        //             .attr("cy", function(d) {
+        //                 return timelineLeesFerryYScale(d["LeesFerry"].low);
+        //             })
+        //             .attr("cx", function(d) {
+        //                 return filterXScale(d["filterYear"]);
+        //             })
+        //             .select("title")
+        //             .text(function(d) {
+        //                 return d["LeesFerry"].low + " (" + d["filterYear"] + ")";
+        //             });
+        //         filterSvg.select(".series.leesferry").select(".chart").selectAll("line")
+        //             .attr("y1", function(d) {
+        //                 return timelineLeesFerryYScale(d["LeesFerry"].low);
+        //             })
+        //             .attr("x2", function(d) {
+        //                 return filterXScale(d["filterYear"]);
+        //             })
+        //             .attr("y2", function(d) {
+        //                 return timelineLeesFerryYScale(d["LeesFerry"].high);
+        //             })
+        //             .attr("x1", function(d) {
+        //                 return filterXScale(d["filterYear"]);
+        //             });                 
+        //     }
+        // } else if (d3.select(this).attr("class").indexOf("pna") !== -1) {
+        //     if (d3.select(this).attr("class").indexOf("high") !== -1) {
+        //         lookup.setHighFilter(timelinePNAYScale.invert(parseFloat(d3.event.y)), "PNA", d.filterYear);
+        //         filterSvg.select(".series.pna").select(".chart").selectAll("circle.high")
+        //             .attr("cy", function(d) {
+        //                 return timelinePNAYScale(d["PNA"].high);
+        //             })
+        //             .attr("cx", function(d) {
+        //                 return filterXScale(d["filterYear"]);
+        //             })
+        //             .select("title")
+        //             .text(function(d) {
+        //                 return d["PNA"].high + " (" + d["filterYear"] + ")";
+        //             });
+        //         filterSvg.select(".series.pna").select(".chart").selectAll("line")
+        //             .attr("y1", function(d) {
+        //                 return timelinePNAYScale(d["PNA"].low);
+        //             })
+        //             .attr("x2", function(d) {
+        //                 return filterXScale(d["filterYear"]);
+        //             })
+        //             .attr("y2", function(d) {
+        //                 return timelinePNAYScale(d["PNA"].high);
+        //             })
+        //             .attr("x1", function(d) {
+        //                 return filterXScale(d["filterYear"]);
+        //             });
+        //     } else if (d3.select(this).attr("class").indexOf("low") !== -1) {
+        //         lookup.setLowFilter(timelinePNAYScale.invert(parseFloat(d3.event.y)), "PNA", d.filterYear);
+        //         filterSvg.select(".series.pna").select(".chart").selectAll("circle.low")
+        //             .attr("cy", function(d) {
+        //                 return timelinePNAYScale(d["PNA"].low);
+        //             })
+        //             .attr("cx", function(d) {
+        //                 return filterXScale(d["filterYear"]);
+        //             })
+        //             .select("title")
+        //             .text(function(d) {
+        //                 return d["PNA"].low + " (" + d["filterYear"] + ")";
+        //             });
+        //         filterSvg.select(".series.pna").select(".chart").selectAll("line")
+        //             .attr("y1", function(d) {
+        //                 return timelinePNAYScale(d["PNA"].low);
+        //             })
+        //             .attr("x2", function(d) {
+        //                 return filterXScale(d["filterYear"]);
+        //             })
+        //             .attr("y2", function(d) {
+        //                 return timelinePNAYScale(d["PNA"].high);
+        //             })
+        //             .attr("x1", function(d) {
+        //                 return filterXScale(d["filterYear"]);
+        //             });                 
+        //     }
+        // } else {
+        //     alert("Something went wrong with filter dragging.");
+        // }
+        // refilter();
+    // },
 
     initFilters: function() {
         // Initialize filters after a dataset has been set.
@@ -78,6 +502,54 @@ Engine.prototype = {
             outgoing.filterYear = parseInt(i);
             this.filters.push(outgoing);
         }
+    },
+
+    initAxis: function() {
+        for (i in this.var_keys) {
+            var k = this.var_keys[i];
+            this.seriesPlotYAxis[k] = d3.svg.axis();
+            this.seriesPlotYAxis[k].scale(this.seriesPlotYScales[k])
+                .orient("left")
+                .ticks(this.seriesPlotTicks)
+                .tickFormat(d3.format("d"));
+        }
+        this.seriesPlotXAxis = d3.svg.axis();
+        this.seriesPlotXAxis.scale(this.seriesPlotXScale)
+            .orient("bottom")
+            .tickFormat(d3.format("d"));
+
+        this.filterPlotXAxis = d3.svg.axis();
+        this.filterPlotXAxis.scale(this.filterPlotXScale)
+            .ticks(this.filter_n)
+            .orient("bottom")
+            .tickFormat(d3.format("d"));
+    },
+
+    initScales: function() {
+        var h = this.seriesPlotDimensions.height / this.var_keys.length - this.seriesPlotDimensions.padding;
+        for (i in this.var_keys) {
+            var k = this.var_keys[i];
+            this.seriesPlotYScales[k] = d3.scale.linear();
+            this.seriesPlotYScales[k].domain([d3.min(this.dataset, function(d) { return d[k]; }),
+                                              d3.max(this.dataset, function(d) { return d[k]; })])
+                .range([h, 0])
+                .nice(this.seriesPlotTicks);
+        }
+        this.seriesPlotXScale = d3.scale.linear();
+        var k_time = this.time_key;
+        this.seriesPlotXScale.domain([d3.min(this.dataset, function(d) { return d[k_time]; }),
+                                      d3.max(this.dataset, function(d) { return d[k_time]; })])
+            .range([0, this.seriesPlotDimensions.width]);
+        this.zoom = d3.behavior.zoom()
+            .x(this.seriesPlotXScale)
+            .scaleExtent(this.zoomExtent)
+            .on("zoom", this.zoomer);
+
+        this.filterPlotXScale = d3.scale.linear();
+        this.filterPlotXScale.domain([d3.min(this.filters, function(d) { return d.filterYear; }),
+                                      d3.max(this.filters, function(d) { return d.filterYear; })])
+            .range([0, this.filterPlotDimensions.width])
+            .nice(this.filter_n);
     },
 
     getFilterLength: function() {
@@ -169,130 +641,38 @@ Engine.prototype = {
             }
         }
     },
+
+    setSeriesPlotId: function(x) {
+        // Set the unique identifier used in the page's HTML which the seriesplot SVG will be attached to.
+        this.plotId.seriesPlot = x;
+    },
+
+    setSeriesPlotHeight: function(x) {
+        this.seriesPlotDimensions.height = x - this.seriesPlotDimensions.margin.top - this.seriesPlotDimensions.margin.bottom;
+    },
+
+    setSeriesPlotWidth: function(x) {
+        this.seriesPlotDimensions.width = x - this.seriesPlotDimensions.margin.left - this.seriesPlotDimensions.margin.right;
+    },
+
+    setSeriesPlotTicks: function(x) {
+        this.seriesPlotTicks = x;
+    },
+
+    setFilterPlotId: function(x) {
+        // Set the unique identifier used in the page's HTML which the seriesplot SVG will be attached to.
+        this.plotId.filterPlot = x;
+    },
+
+    setFilterPlotHeight: function(x) {
+        this.filterPlotDimensions.height = x - this.filterPlotDimensions.margin.top - this.filterPlotDimensions.margin.bottom;
+    },
+
+    setFilterPlotWidth: function(x) {
+        this.filterPlotDimensions.width = x - this.filterPlotDimensions.margin.left - this.filterPlotDimensions.margin.right;
+    },
+
+    setFilterPlotTicks: function(x) {
+        this.filterPlotTicks = x;
+    }
 };
-
-// var lookup = {
-//  // TODO: Change this into a proper constructor function as in 
-//  //       'Javascript Definitive' p202
-
-//  dataset: {},
-
-//  // An example of a filter array:
-//  // [ {"filterYear": 0, 
-//  //    "FourRivers": {"high": 0, "low": 0},
-//  //    "LeesFerry":  {"high": 0, "low": 0},
-//  //    "PNA":        {"high": 0, "low": 0}},
-//  //    {"filterYear": 1, 
-//  //    "FourRivers": {"high": 0, "low": 0},
-//  //    "LeesFerry":  {"high": 0, "low": 0},
-//  //    "PNA":        {"high": 0, "low": 0}}];
-//  filters: [],
-
-//  getFilterLength: function() {
-//      // Return the number of years (length) of the filter.
-//      // Note that this assumes this.initFilters() has already been run.
-//      return this.filters.length;
-//  },
-
-//  setData: function(x) {
-//      // Store a reference to the dataset that will be filtered.
-//      this.dataset = x;
-//      this.initFilters();
-//  },
-
-//  initFilters: function() {
-//      // Initialize filters after a dataset has been set. 
-//      // A three year filter is set using the max and min values of each series.
-//      for (i in range(3)) {
-//          this.filters.push({"filterYear": parseInt(i),
-//                             "FourRivers": {"high": d3.max(lookup.dataset, function(d) { return d["FourRivers"]; }),
-//                                            "low": d3.min(lookup.dataset, function(d) { return d["FourRivers"]; })},
-//                             "LeesFerry":  {"high": d3.max(lookup.dataset, function(d) { return d["LeesFerry"]; }),
-//                                            "low": d3.min(lookup.dataset, function(d) { return d["LeesFerry"]; })},
-//                             "PNA":        {"high": d3.max(lookup.dataset, function(d) { return d["PNA"]; }),
-//                                            "low": d3.min(lookup.dataset, function(d) { return d["PNA"]; })},
-//                            }
-//          );
-//      }
-//  },
-
-//  getMatchArray: function() {
-//      // Get an array with objects that give the target values after applying current filter.
-//      // Note that this is not the year matched by the filters but the following year.
-//      var matches = this.filter();
-//      var out = [];
-//      var i;
-//      for (i = 0; i < this.dataset.length; i += 1) {
-//          if (matches.indexOf(this.dataset[i].Year) !== -1) {
-//              out.push(this.dataset[i]);
-//          }
-//      }
-//      return out;
-//  },
-
-//  filter: function(filters, firstrun, candidates) {
-//      // Filter the dataset based on this.filters. Returns an array of the 
-//      // single years following the matched pattern.
-//      firstrun =  typeof firstrun !== 'undefined' ? firstrun : true;
-//      candidates =  typeof candidates !== 'undefined' ? candidates : [];
-//      if (firstrun) {
-//          filters = this.filters.slice(0); // Not sure if this will corrupt object attribute.
-//          candidates = range(this.dataset.length - filters.length);
-//      }
-//      // console.log({"filters": filters, "candidates": candidates}); // DEBUG
-//      if ((filters.length == 0) || (candidates.length == 0)) {
-//          var final = [];
-//          var i;
-//          for (i = 0; i < candidates.length; i += 1) {
-//              final.push(this.dataset[candidates[i]].Year);
-//          }
-//          return final;
-//      }
-//      var filter_select = filters.shift();
-//      var good_match = [];
-//      // console.log({"filters": filters, "candidates": candidates, "good_match": good_match}); // DEBUG
-//      var i;
-//      for (i = 0; i < candidates.length; i += 1) {
-//          if ((this.dataset[candidates[i]].FourRivers >= filter_select.FourRivers.low)
-//              && (this.dataset[candidates[i]].FourRivers <= filter_select.FourRivers.high)
-//              && (this.dataset[candidates[i]].LeesFerry >= filter_select.LeesFerry.low)
-//              && (this.dataset[candidates[i]].LeesFerry <= filter_select.LeesFerry.high)
-//              && (this.dataset[candidates[i]].PNA >= filter_select.PNA.low)
-//              && (this.dataset[candidates[i]].PNA <= filter_select.PNA.high)) {
-//              good_match.push(parseInt(candidates[i]) + 1);
-//          }
-//      }
-//      return this.filter(filters = filters, firstrun = false, candidates = good_match);
-//  },
-
-//  setHighFilter: function(x, series, year) {
-//      // Set the high value of a filter given value `x`, the series key and the `filterYear`.
-
-//      // TODO: Combine the logic of setHighFilter and setLowFilter into a 
-//      // single function and add logic that ensures the high and low values 
-//      // stay within the data's range and that `high` cannot be lower than 
-//      // `low`, etc...
-//      var i;
-//      for (i = 0; i < this.filters.length; i += 1) {
-//          if (this.filters[i].filterYear === year) {
-//              this.filters[i][series].high = x;
-//          }
-//      }
-//  },
-
-//  setLowFilter: function(x, series, year) {
-//      // Set the low value of a filter given value `x`, the series key and the `filterYear`.
-
-//      // TODO: Combine the logic of setHighFilter and setLowFilter into a 
-//      // single function and add logic that ensures the high and low values 
-//      // stay within the data's range and that `high` cannot be lower than 
-//      // `low`, etc...
-
-//      var i;
-//      for (i = 0; i < this.filters.length; i += 1) {
-//          if (this.filters[i].filterYear === year) {
-//              this.filters[i][series].low = x;
-//          }
-//      }
-//  },
-// };
