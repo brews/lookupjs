@@ -55,6 +55,17 @@ function Engine(n) {
         "width": 0,
         "height": 0,
     };
+    this.histPlotDimensions = {
+        "margin": {"top": 0,
+                   "right": 0,
+                   "bottom": 0,
+                   "left": 0},
+        "padding": 0,
+        "width": 0,
+        "height": 0,
+    };
+    this.histPlotXScale = d3.scale.linear();
+    this.histPlotXAxis = d3.svg.axis();
     this.filterPlotXScale = d3.scale.linear();
     this.filterPlotXAxis = d3.svg.axis();
     this.seriesPlotXScale = d3.scale.linear();
@@ -80,12 +91,21 @@ Engine.prototype = {
         this.filterPlotDimensions.margin = x;
     },
 
+    setHistPlotMargin: function(x) {
+        // Pass in an object with keys "top", "right", "bottom", "left", to integers.
+        this.histPlotDimensions.margin = x;
+    },
+
     setSeriesPlotPadding: function(x) {
         this.seriesPlotDimensions.padding = x;
     },
 
     setFilterPlotPadding: function(x) {
         this.filterPlotDimensions.padding = x;
+    },
+
+    setHistPlotPadding: function(x) {
+        this.histPlotDimensions.padding = x;
     },
 
     setData: function(x, timekey) {
@@ -126,7 +146,7 @@ Engine.prototype = {
     drawPlots: function() {
         this.drawSeriesPlot();
         this.drawFilterPlot();
-        // this.drawHistPlot();
+        this.drawHistPlot();
     },
 
     drawSeriesPlot: function() {
@@ -257,7 +277,7 @@ Engine.prototype = {
                 .text(function(d) { return d[k].low + " (" + d[k_time] + ")"; });
             this.filterPlotSvg.select(".series." + k).append("g")
                 .attr("class", "axis y")
-                .call(kScale);
+                .call(this.seriesPlotYAxis[k]);
         }
         this.filterPlotSvg.select("#filterplotspace").append("g")
             .attr("class", "axis x")
@@ -270,7 +290,108 @@ Engine.prototype = {
     },
 
     drawHistPlot: function() {
+        //
+        var h = this.histPlotDimensions.height / this.var_keys.length - this.histPlotDimensions.padding;
+        this.initHistPlotBins();
+        this.histPlotSvg = d3.select(this.plotId.histPlot).append("svg")
+            .attr("width", this.histPlotDimensions.width + this.histPlotDimensions.margin.left + this.histPlotDimensions.margin.right)
+            .attr("height", this.histPlotDimensions.height + this.histPlotDimensions.margin.top + this.histPlotDimensions.margin.bottom);
+        this.histPlotSvg.append("g")
+            .attr("id", "yearhistplotspace")
+            .attr("transform", "translate(" + this.histPlotDimensions.margin.left + ", " + this.histPlotDimensions.margin.top + ")")
+            .append("clipPath")
+            .attr("id", "yearhist-clip")
+            .append("rect")
+            .attr("cy", 0)
+            .attr("cx", 0)
+            .attr("height", this.histPlotDimensions.height)
+            .attr("width", this.histPlotDimensions.width);
+        var halfPadding = this.histPlotDimensions.padding / 2;
+        var blockHeight = this.histPlotDimensions.height / this.var_keys.length;
+        for (i in this.var_keys) {
+            var k = this.var_keys[i];
+            var kScale = this.seriesPlotYScales[k];
+            var xScale = this.histPlotXScale;
+            this.histPlotSvg.select("#yearhistplotspace").append("g")
+                .attr("class", "series " + k)
+                .attr("transform", "translate(0, " + ((blockHeight * i) + halfPadding) + ")")
+                .append("g")
+                .attr("class", "chart yearhist")
+                .append("rect")
+                .attr("cy", 0)
+                .attr("cx", 0)
+                .attr("height", h)
+                .attr("width", this.histPlotDimensions.width)
+                .attr("class", "yearhist chart background");
+            this.histPlotSvg.select(".series." + k).select(".chart").selectAll(".bar")
+                .data(this.histPlotBins[k])
+                .enter()
+                .append("rect")
+                .attr("class", "yearhist yearhistplotrect " + k)
+                .attr("y", function(d) { return kScale(d.x + d.dx); })
+                .attr("x", 0)
+                .attr("height", function(d) { return kScale(d.x) - kScale(d.dx + d.x); })
+                .attr("width", 0)
+                .append("title")
+                .text(function(d) { return d.y + " events (" + d.x + " - " + (d.x + d.dx) + ")"; });
+            this.histPlotSvg.select(".series." + k).append("g")
+                .attr("class", "axis y")
+                .call(this.seriesPlotYAxis[k]);
+        }
+        this.histPlotSvg.select("#yearhistplotspace").append("g")
+            .attr("class", "axis x")
+            .attr("transform", "translate(0, " + this.histPlotDimensions.height + ")")
+            .call(this.histPlotXAxis);
+        this.histPlotSvg.selectAll(".yearhist.chart")
+            .attr("clip-path", "url(#yearhist-clip)");
+    },
+    
+    initHistPlotBins: function(m) {
+        // Refresh the single year histogram given `m`, an array, like 
+        //`this.dataset`, which has an object for each target
+        // -not matched- year.
+        m =  typeof m !== 'undefined' ? m : this.dataset;
+        this.histPlotBins = {};
+        for (i in this.var_keys) {
+            var k = this.var_keys[i];
+            this.histPlotBins[k] = d3.layout.histogram()
+                .bins(this.seriesPlotYScales[k].ticks(this.seriesPlotTicks))
+                (m.map(function(d) {return d[k]; }));
+        }
+    },
 
+    refreshHistPlotBins: function(m) {
+        // Refresh the single year histogram bins given `m`, an array, like 
+        //`this.dataset`, which has an object for each target
+        // -not matched- year. This also resets the histPlot scales and axis.
+        this.initHistPlotBins(m);
+        var maxNo = d3.max(this.histPlotBins[this.var_keys[0]].map(function(d) { return d.y; }));
+        for (i in this.var_keys) {
+            var currentVictim = d3.max(this.histPlotBins[this.var_keys[i]].map(function(d) { return d.y; }));
+            if (currentVictim > maxNo) {
+                maxNo = currentVictim;
+            }
+        }
+        this.histPlotXScale.domain([0, maxNo]);
+        this.histPlotXAxis.scale(this.histPlotXScale);
+        this.histPlotSvg.select("#yearhistplotspace").selectAll(".axis.x").call(this.histPlotXAxis);
+        for (i in this.var_keys) {
+            var k = this.var_keys[i];
+            var kScale = this.seriesPlotYScales[k];
+            var xScale = this.histPlotXScale;
+            this.histPlotSvg.selectAll(".yearhistplotrect." + k)
+                .data(this.histPlotBins[k])
+                .attr("width", function(d) { return xScale(d.y); })
+                .select("title")
+                .text(function(d) { return d.y + " events (" + d.x + " - " + (d.x + d.dx) + ")"; });
+        }
+    },
+
+    refilter: function() {
+        // Rerun the lookup filter engine and refresh plots as needed.
+        var matched = this.getMatchArray();
+        this.highlight(matched.map(function(d) { return d.Year; }));
+        this.refreshHistPlotBins(matched);
     },
 
     // zoomer: function() {
@@ -523,6 +644,11 @@ Engine.prototype = {
             .ticks(this.filter_n)
             .orient("bottom")
             .tickFormat(d3.format("d"));
+
+        this.histPlotXAxis = d3.svg.axis();
+        this.histPlotXAxis.scale(this.histPlotXScale)
+            .orient("bottom")
+            .tickFormat(d3.format("d"));
     },
 
     initScales: function() {
@@ -550,6 +676,11 @@ Engine.prototype = {
                                       d3.max(this.filters, function(d) { return d.filterYear; })])
             .range([0, this.filterPlotDimensions.width])
             .nice(this.filter_n);
+
+        this.histPlotXScale = d3.scale.linear();
+        this.histPlotXScale.domain([0, this.dataset.length])
+            .range([0, this.histPlotDimensions.width])
+            .nice();
     },
 
     getFilterLength: function() {
@@ -590,7 +721,6 @@ Engine.prototype = {
             return final;
         }
         var filter_select = filters.shift();
-        console.log(filter_select);  // DEBUG
         var good_match = [];
         var i;
         for (i = 0; i < candidates.length; i += 1) {
@@ -674,5 +804,22 @@ Engine.prototype = {
 
     setFilterPlotTicks: function(x) {
         this.filterPlotTicks = x;
-    }
+    },
+
+    setHistPlotId: function(x) {
+        // Set the unique identifier used in the page's HTML which the histplot SVG will be attached to.
+        this.plotId.histPlot = x;
+    },
+
+    setHistPlotHeight: function(x) {
+        this.histPlotDimensions.height = x - this.histPlotDimensions.margin.top - this.histPlotDimensions.margin.bottom;
+    },
+
+    setHistPlotWidth: function(x) {
+        this.histPlotDimensions.width = x - this.histPlotDimensions.margin.left - this.histPlotDimensions.margin.right;
+    },
+
+    setHistPlotTicks: function(x) {
+        this.histPlotTicks = x;
+    },
 };

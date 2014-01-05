@@ -36,9 +36,15 @@
     test.setFilterPlotPadding(12);
     test.setFilterPlotMargin({top: 20, right: 50, bottom: 20, left: 50});
 
+    test.setHistPlotWidth(260);
+    test.setHistPlotHeight(300);
+    test.setHistPlotPadding(12);
+    test.setHistPlotMargin({top: 20, right: 50, bottom: 20, left: 50});
+
 	test.setData(dataset, "Year");
 	test.setSeriesPlotId("#timeline-chart");
 	test.setFilterPlotId("#filter-chart");
+	test.setHistPlotId("#yearhist-chart");
 	test.drawPlots();
 	// test.setHighFilter(0.5, "PNA", 0)
 	// console.log(test.getMatchArray());
