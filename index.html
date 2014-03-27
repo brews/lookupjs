@@ -220,20 +220,20 @@
 
 
 	test.setSeriesPlotWidth(660);
-	test.setSeriesPlotHeight(300);
+	test.setSeriesPlotHeight(800);
 	test.setSeriesPlotTicks(5);
 	test.setSeriesPlotPadding(12);
-	test.setSeriesPlotMargin({top: 20, right: 50, bottom: 20, left: 50});
+	test.setSeriesPlotMargin({top: 20, right: 50, bottom: 20, left: 150});
 
-    test.setFilterPlotWidth(260);
-    test.setFilterPlotHeight(300);
+    test.setFilterPlotWidth(75);
+    test.setFilterPlotHeight(800);
     test.setFilterPlotPadding(12);
-    test.setFilterPlotMargin({top: 20, right: 50, bottom: 20, left: 50});
+    test.setFilterPlotMargin({top: 20, right: 50, bottom: 20, left: 150});
 
     test.setHistPlotWidth(260);
-    test.setHistPlotHeight(300);
+    test.setHistPlotHeight(800);
     test.setHistPlotPadding(12);
-    test.setHistPlotMargin({top: 20, right: 50, bottom: 20, left: 50});
+    test.setHistPlotMargin({top: 20, right: 50, bottom: 20, left: 150});
 
 
     var dataset = [];  // DEBUG
@@ -243,15 +243,20 @@
              console.log(error);
          } else {
              data.forEach(function(d, index) {
-                 // Convert strings to numbers and assign to `dataset`.
-                 var dkeys = d3.keys(d);
-                 var outgoing = {};
-                 for (var i = 0; i < dkeys.length; i++) {
-                     outgoing[dkeys[i]] = +d[dkeys[i]];
-                 }
-                 dataset[index] = outgoing;
+                // Convert strings to numbers and assign to `dataset`.
+                var dkeys = d3.keys(d);
+                var outgoing = {};
+                for (var i = 0; i < dkeys.length; i++) {
+                    if (d[dkeys[i]] === "") {  // DEBUG
+                        // console.log("should be null")
+                        outgoing[dkeys[i]] = null;  // Maybe `undefined` instead of `null`.
+                    } else {
+                        outgoing[dkeys[i]] = +d[dkeys[i]];
+                    }
+                }
+                dataset[index] = outgoing;
              });
-         console.log(dataset); // DEBUG
+         // console.log(dataset); // DEBUG
          test.setData(dataset, "Year");
          test.setSeriesPlotId("#timeline-chart");
          test.setFilterPlotId("#filter-chart");

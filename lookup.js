@@ -206,6 +206,11 @@ Engine.prototype = {
             this.seriesPlotSvg.select(".series." + k).append("g")
                 .attr("class", "axis y")
                 .call(this.seriesPlotYAxis[k]);
+            this.seriesPlotSvg.append("text")
+                .attr("class", "axis y label")
+                .style("text-anchor", "middle")
+                .attr("transform", "translate(" + (this.seriesPlotDimensions.margin.left/2) + "," + (((blockHeight * i) + (halfPadding * i)) + (blockHeight/2)) + ")rotate(-90)")
+                .text(k);
         }
         this.seriesPlotSvg.select("#timelineplotspace").append("g")
             .attr("class", "axis x")
@@ -281,6 +286,11 @@ Engine.prototype = {
             this.filterPlotSvg.select(".series." + k).append("g")
                 .attr("class", "axis y")
                 .call(this.seriesPlotYAxis[k]);
+            this.filterPlotSvg.append("text")
+                .attr("class", "axis y label")
+                .style("text-anchor", "middle")
+                .attr("transform", "translate(" + (this.seriesPlotDimensions.margin.left/2) + "," + (((blockHeight * i) + (halfPadding * i)) + (blockHeight/2)) + ")rotate(-90)")
+                .text(k);
         }
         this.filterPlotSvg.select("#filterplotspace").append("g")
             .attr("class", "axis x")
@@ -340,6 +350,11 @@ Engine.prototype = {
             this.histPlotSvg.select(".series." + k).append("g")
                 .attr("class", "axis y")
                 .call(this.seriesPlotYAxis[k]);
+            this.histPlotSvg.append("text")
+                .attr("class", "axis y label")
+                .style("text-anchor", "middle")
+                .attr("transform", "translate(" + (this.seriesPlotDimensions.margin.left/2) + "," + (((blockHeight * i) + (halfPadding * i)) + (blockHeight/2)) + ")rotate(-90)")
+                .text(k);
         }
         this.histPlotSvg.select("#yearhistplotspace").append("g")
             .attr("class", "axis x")
