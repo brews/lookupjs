@@ -521,8 +521,8 @@ Engine.prototype = {
         for (i = 0; i < candidates.length; i += 1) {
             var good_so_far = true;
             for (j in this.var_keys) {
-                if ((this.dataset[candidates[i]][this.var_keys[j]] >= filter_select[this.var_keys[j]]["low"])
-                 && (this.dataset[candidates[i]][this.var_keys[j]] <= filter_select[this.var_keys[j]]["high"])) {
+                if (!this.dataset[candidates[i]][this.var_keys[j]] || ((this.dataset[candidates[i]][this.var_keys[j]] >= filter_select[this.var_keys[j]]["low"])
+                 && (this.dataset[candidates[i]][this.var_keys[j]] <= filter_select[this.var_keys[j]]["high"]))) {
                     continue;
                 } else {
                     good_so_far = false;
