@@ -384,6 +384,8 @@ Engine.prototype = {
             var xScale = this.histPlotXScale;
             this.histPlotSvg.selectAll(".yearhistplotrect." + k)
                 .data(this.histPlotBins[k])
+                .transition()
+                .duration(200)
                 .attr("width", function(d) { return xScale(d.y); })
                 .select("title")
                 .text(function(d) { return d.y + " events (" + d.x + " - " + (d.x + d.dx) + ")"; });
