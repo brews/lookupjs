@@ -235,11 +235,32 @@
     test.setHistPlotPadding(12);
     test.setHistPlotMargin({top: 20, right: 50, bottom: 20, left: 50});
 
-	test.setData(dataset, "Year");
-	test.setSeriesPlotId("#timeline-chart");
-	test.setFilterPlotId("#filter-chart");
-	test.setHistPlotId("#yearhist-chart");
-	test.drawPlots();
+
+    var dataset = [];  // DEBUG
+    d3.csv("riverclimate.json", function(error, data) {
+         // TODO: Still need some error catching here.
+         if (error) {
+             console.log(error);
+         } else {
+             data.forEach(function(d, index) {
+                 // Convert strings to numbers and assign to `dataset`.
+                 var dkeys = d3.keys(d);
+                 var outgoing = {};
+                 for (var i = 0; i < dkeys.length; i++) {
+                     outgoing[dkeys[i]] = +d[dkeys[i]];
+                 }
+                 dataset[index] = outgoing;
+             });
+         console.log(dataset); // DEBUG
+         // lookup.setData(dataset);
+         test.setData(dataset, "Year");
+         test.setSeriesPlotId("#timeline-chart");
+         test.setFilterPlotId("#filter-chart");
+         test.setHistPlotId("#yearhist-chart");
+
+         test.drawPlots();
+         }
+    });
 	// test.setHighFilter(0.5, "PNA", 0)
 	// console.log(test.getMatchArray());
 ///////////////////////////////////////////////////////////////////////////////
