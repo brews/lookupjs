@@ -33,7 +33,6 @@ function Engine(n) {
     //    "LeesFerry":  {"high": 0, "low": 0},
     //    "PNA":        {"high": 0, "low": 0}}];
     this.filters = [];
-    // var this.filters = new Array(this.filter_n);  // Not sure this really works.
     this.var_keys = [];  // String array giving variable keys in each dataset object.
     this.time_key = "";  // The key for the observation time in each dataset object.
     this.plotId = {};
@@ -76,8 +75,12 @@ function Engine(n) {
     this.seriesPlotDimensions.circleRadius = 4;
     this.zoomExtent = [1, 8];
     this.previousScale = 1;
-    this.drag = d3.behavior.drag();
-    this.drag.on("drag", this.dragger);
+    this.drag = d3.behavior.drag()
+        .on("drag", dragger);
+    this.zoom = d3.behavior.zoom()
+        .x(this.seriesPlotXScale)
+        .scaleExtent(this.zoomExtent)
+        .on("zoom", zoomer);
 }
 
 Engine.prototype = {
@@ -259,7 +262,7 @@ Engine.prototype = {
                 .data(this.filters)
                 .enter()
                 .append("circle")
-                .attr("class", "filter filterplotcircle high" + k)
+                .attr("class", "filter filterplotcircle high " + k)
                 .attr("cy", function(d) { return kScale(d[k].high); })
                 .attr("cx", function(d) { return xScale(d[k_time]); })
                 .attr("r", this.seriesPlotDimensions.circleRadius)
@@ -269,7 +272,7 @@ Engine.prototype = {
                 .data(this.filters)
                 .enter()
                 .append("circle")
-                .attr("class", "filter filterplotcircle low" + k)
+                .attr("class", "filter filterplotcircle low " + k)
                 .attr("cy", function(d) { return kScale(d[k].low); })
                 .attr("cx", function(d) { return xScale(d[k_time]); })
                 .attr("r", this.seriesPlotDimensions.circleRadius)
@@ -394,218 +397,12 @@ Engine.prototype = {
         this.refreshHistPlotBins(matched);
     },
 
-    // zoomer: function() {
+    // zoomer: function(d) {
         // Called when zoom events are triggered. Transitions if zoom, not if panned.
-        // TODO(sbm): This doesn't quite work yet.
-        // console.log(d3.event.scale);  // DEBUG
-        // var k_time = this.time_key;
-        // var xScale = this.SeriesPlotXScale;
-        // var durationtime = 200;
-        // var t = d3.event.translate;
-        // var s = d3.event.scale;
-        // t[0] = Math.min(0, Math.max(this.seriesPlotDimensions.width * (1 - s), t[0]));            
-        // zoom.translate(t);
-        // if (s == this.previousScale) {
-        //     this.seriesPlotSvg.select("#timelineplotspace")
-        //         .select(".axis.x")
-        //         .call(this.seriesPlotXAxis);
-        //     this.seriesPlotSvg.selectAll(".lineplotcircle")
-        //         .attr("cx", function(d) { return xScale(d[k_time]); });
-        //     for (i in this.var_keys) {
-        //         var k = this.var_keys[i];
-        //         this.seriesPlotSvg.select(".lineplotpath." + k)
-        //             .attr("d", this.seriesPlotLines[k](this.dataset))
-        //     }
-        // } else {
-        //     this.seriesPlotSvg.select("#timelineplotspace")
-        //         .select(".axis.x")
-        //         .transition()
-        //         .duration(durationtime)
-        //         .call(this.seriesPlotXAxis);
-        //     this.seriesPlotSvg.selectAll(".lineplotcircle")
-        //         .transition()
-        //         .duration(durationtime)
-        //         .attr("cx", function(d) { return xScale(d["Year"]); });
-        //     for (i in this.var_keys) {
-        //         var k = this.var_keys[i];
-        //         this.seriesPlotSvg.select(".lineplotpath." + k)
-        //             .transition()
-        //             .duration(durationtime)
-        //             .attr("d", this.seriesPlotLines[k](this.dataset))
-        //     }
-        // }
-        // this.previousScale = s;
     // },
 
     // dragger: function(d) {
         // Called whenever drag events are fired. Intended to work on filterSvg circles.
-        // TODO: Check for which series to return back to is a bit hackish. Consider this when redoing the data design.
-        // if (d3.select(this).attr("class").indexOf("fourrivers") !== -1) {
-        //     if (d3.select(this).attr("class").indexOf("high") !== -1) {
-        //         lookup.setHighFilter(timelineFourRiversYScale.invert(parseFloat(d3.event.y)), "FourRivers", d.filterYear);
-        //         filterSvg.select(".series.fourrivers").select(".chart").selectAll("circle.high")
-        //             .attr("cy", function(d) {
-        //                 return timelineFourRiversYScale(d["FourRivers"].high);
-        //             })
-        //             .attr("cx", function(d) {
-        //                 return filterXScale(d["filterYear"]);
-        //             })
-        //             .select("title")
-        //             .text(function(d) {
-        //                 return d["FourRivers"].high + " (" + d["filterYear"] + ")";
-        //             });
-        //         filterSvg.select(".series.fourrivers").select(".chart").selectAll("line")
-        //             .attr("y1", function(d) {
-        //                 return timelineFourRiversYScale(d["FourRivers"].low);
-        //             })
-        //             .attr("x2", function(d) {
-        //                 return filterXScale(d["filterYear"]);
-        //             })
-        //             .attr("y2", function(d) {
-        //                 return timelineFourRiversYScale(d["FourRivers"].high);
-        //             })
-        //             .attr("x1", function(d) {
-        //                 return filterXScale(d["filterYear"]);
-        //             });
-        //     } else if (d3.select(this).attr("class").indexOf("low") !== -1) {
-        //         lookup.setLowFilter(timelineFourRiversYScale.invert(parseFloat(d3.event.y)), "FourRivers", d.filterYear);
-        //         filterSvg.select(".series.fourrivers").select(".chart").selectAll("circle.low")
-        //             .attr("cy", function(d) {
-        //                 return timelineFourRiversYScale(d["FourRivers"].low);
-        //             })
-        //             .attr("cx", function(d) {
-        //                 return filterXScale(d["filterYear"]);
-        //             })
-        //             .select("title")
-        //             .text(function(d) {
-        //                 return d["FourRivers"].low + " (" + d["filterYear"] + ")";
-        //             });
-        //         filterSvg.select(".series.fourrivers").select(".chart").selectAll("line")
-        //             .attr("y1", function(d) {
-        //                 return timelineFourRiversYScale(d["FourRivers"].low);
-        //             })
-        //             .attr("x2", function(d) {
-        //                 return filterXScale(d["filterYear"]);
-        //             })
-        //             .attr("y2", function(d) {
-        //                 return timelineFourRiversYScale(d["FourRivers"].high);
-        //             })
-        //             .attr("x1", function(d) {
-        //                 return filterXScale(d["filterYear"]);
-        //             });                 
-        //     }
-        // } else if (d3.select(this).attr("class").indexOf("leesferry") !== -1) {
-        //     if (d3.select(this).attr("class").indexOf("high") !== -1) {
-        //         lookup.setHighFilter(timelineLeesFerryYScale.invert(parseFloat(d3.event.y)), "LeesFerry", d.filterYear);
-        //         filterSvg.select(".series.leesferry").select(".chart").selectAll("circle.high")
-        //             .attr("cy", function(d) {
-        //                 return timelineLeesFerryYScale(d["LeesFerry"].high);
-        //             })
-        //             .attr("cx", function(d) {
-        //                 return filterXScale(d["filterYear"]);
-        //             })
-        //             .select("title")
-        //             .text(function(d) {
-        //                 return d["LeesFerry"].high + " (" + d["filterYear"] + ")";
-        //             });
-        //         filterSvg.select(".series.leesferry").select(".chart").selectAll("line")
-        //             .attr("y1", function(d) {
-        //                 return timelineLeesFerryYScale(d["LeesFerry"].low);
-        //             })
-        //             .attr("x2", function(d) {
-        //                 return filterXScale(d["filterYear"]);
-        //             })
-        //             .attr("y2", function(d) {
-        //                 return timelineLeesFerryYScale(d["LeesFerry"].high);
-        //             })
-        //             .attr("x1", function(d) {
-        //                 return filterXScale(d["filterYear"]);
-        //             });
-        //     } else if (d3.select(this).attr("class").indexOf("low") !== -1) {
-        //         lookup.setLowFilter(timelineLeesFerryYScale.invert(parseFloat(d3.event.y)), "LeesFerry", d.filterYear);
-        //         filterSvg.select(".series.leesferry").select(".chart").selectAll("circle.low")
-        //             .attr("cy", function(d) {
-        //                 return timelineLeesFerryYScale(d["LeesFerry"].low);
-        //             })
-        //             .attr("cx", function(d) {
-        //                 return filterXScale(d["filterYear"]);
-        //             })
-        //             .select("title")
-        //             .text(function(d) {
-        //                 return d["LeesFerry"].low + " (" + d["filterYear"] + ")";
-        //             });
-        //         filterSvg.select(".series.leesferry").select(".chart").selectAll("line")
-        //             .attr("y1", function(d) {
-        //                 return timelineLeesFerryYScale(d["LeesFerry"].low);
-        //             })
-        //             .attr("x2", function(d) {
-        //                 return filterXScale(d["filterYear"]);
-        //             })
-        //             .attr("y2", function(d) {
-        //                 return timelineLeesFerryYScale(d["LeesFerry"].high);
-        //             })
-        //             .attr("x1", function(d) {
-        //                 return filterXScale(d["filterYear"]);
-        //             });                 
-        //     }
-        // } else if (d3.select(this).attr("class").indexOf("pna") !== -1) {
-        //     if (d3.select(this).attr("class").indexOf("high") !== -1) {
-        //         lookup.setHighFilter(timelinePNAYScale.invert(parseFloat(d3.event.y)), "PNA", d.filterYear);
-        //         filterSvg.select(".series.pna").select(".chart").selectAll("circle.high")
-        //             .attr("cy", function(d) {
-        //                 return timelinePNAYScale(d["PNA"].high);
-        //             })
-        //             .attr("cx", function(d) {
-        //                 return filterXScale(d["filterYear"]);
-        //             })
-        //             .select("title")
-        //             .text(function(d) {
-        //                 return d["PNA"].high + " (" + d["filterYear"] + ")";
-        //             });
-        //         filterSvg.select(".series.pna").select(".chart").selectAll("line")
-        //             .attr("y1", function(d) {
-        //                 return timelinePNAYScale(d["PNA"].low);
-        //             })
-        //             .attr("x2", function(d) {
-        //                 return filterXScale(d["filterYear"]);
-        //             })
-        //             .attr("y2", function(d) {
-        //                 return timelinePNAYScale(d["PNA"].high);
-        //             })
-        //             .attr("x1", function(d) {
-        //                 return filterXScale(d["filterYear"]);
-        //             });
-        //     } else if (d3.select(this).attr("class").indexOf("low") !== -1) {
-        //         lookup.setLowFilter(timelinePNAYScale.invert(parseFloat(d3.event.y)), "PNA", d.filterYear);
-        //         filterSvg.select(".series.pna").select(".chart").selectAll("circle.low")
-        //             .attr("cy", function(d) {
-        //                 return timelinePNAYScale(d["PNA"].low);
-        //             })
-        //             .attr("cx", function(d) {
-        //                 return filterXScale(d["filterYear"]);
-        //             })
-        //             .select("title")
-        //             .text(function(d) {
-        //                 return d["PNA"].low + " (" + d["filterYear"] + ")";
-        //             });
-        //         filterSvg.select(".series.pna").select(".chart").selectAll("line")
-        //             .attr("y1", function(d) {
-        //                 return timelinePNAYScale(d["PNA"].low);
-        //             })
-        //             .attr("x2", function(d) {
-        //                 return filterXScale(d["filterYear"]);
-        //             })
-        //             .attr("y2", function(d) {
-        //                 return timelinePNAYScale(d["PNA"].high);
-        //             })
-        //             .attr("x1", function(d) {
-        //                 return filterXScale(d["filterYear"]);
-        //             });                 
-        //     }
-        // } else {
-        //     alert("Something went wrong with filter dragging.");
-        // }
-        // refilter();
     // },
 
     initFilters: function() {
@@ -666,10 +463,6 @@ Engine.prototype = {
         this.seriesPlotXScale.domain([d3.min(this.dataset, function(d) { return d[k_time]; }),
                                       d3.max(this.dataset, function(d) { return d[k_time]; })])
             .range([0, this.seriesPlotDimensions.width]);
-        this.zoom = d3.behavior.zoom()
-            .x(this.seriesPlotXScale)
-            .scaleExtent(this.zoomExtent)
-            .on("zoom", this.zoomer);
 
         this.filterPlotXScale = d3.scale.linear();
         this.filterPlotXScale.domain([d3.min(this.filters, function(d) { return d.filterYear; }),

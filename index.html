@@ -25,6 +25,200 @@
 	var dataset = [{"Year":1950,"FourRivers":14.44,"LeesFerry":13317921,"PNA":-0.6066666667},{"Year":1951,"FourRivers":22.95,"LeesFerry":12485833,"PNA":-0.3333333333},{"Year":1952,"FourRivers":28.6,"LeesFerry":20900043,"PNA":0.7166666667},{"Year":1953,"FourRivers":20.09,"LeesFerry":11204001,"PNA":-0.3716666667},{"Year":1954,"FourRivers":17.43,"LeesFerry":8368141,"PNA":-0.44},{"Year":1955,"FourRivers":10.98,"LeesFerry":9795470,"PNA":-1.0016666667},{"Year":1956,"FourRivers":29.89,"LeesFerry":11505097,"PNA":-0.1166666667},{"Year":1957,"FourRivers":14.89,"LeesFerry":20159803,"PNA":0.4383333333},{"Year":1958,"FourRivers":29.71,"LeesFerry":16899937,"PNA":-0.135},{"Year":1959,"FourRivers":12.05,"LeesFerry":9232537,"PNA":0.1933333333},{"Year":1960,"FourRivers":13.06,"LeesFerry":11974847,"PNA":0.3933333333},{"Year":1961,"FourRivers":11.97,"LeesFerry":9247778,"PNA":-0.605},{"Year":1962,"FourRivers":15.11,"LeesFerry":17769350,"PNA":-0.0783333333},{"Year":1963,"FourRivers":22.99,"LeesFerry":9259450,"PNA":0.1216666667},{"Year":1964,"FourRivers":10.92,"LeesFerry":10801202,"PNA":-0.7783333333},{"Year":1965,"FourRivers":25.64,"LeesFerry":18866401,"PNA":-0.4316666667},{"Year":1966,"FourRivers":12.95,"LeesFerry":11622229,"PNA":-1},{"Year":1967,"FourRivers":24.06,"LeesFerry":11808474,"PNA":-0.2433333333},{"Year":1968,"FourRivers":13.64,"LeesFerry":13508237,"PNA":-0.3483333333},{"Year":1969,"FourRivers":26.98,"LeesFerry":14849712,"PNA":0.6583333333},{"Year":1970,"FourRivers":24.06,"LeesFerry":15344263,"PNA":-0.4616666667},{"Year":1971,"FourRivers":22.57,"LeesFerry":15328915,"PNA":-1.0283333333},{"Year":1972,"FourRivers":13.43,"LeesFerry":12639988,"PNA":0.1916666667},{"Year":1973,"FourRivers":20.05,"LeesFerry":19454642,"PNA":-0.685},{"Year":1974,"FourRivers":32.5,"LeesFerry":13514611,"PNA":-0.0516666667},{"Year":1975,"FourRivers":19.23,"LeesFerry":17040250,"PNA":-0.3483333333},{"Year":1976,"FourRivers":8.22,"LeesFerry":11467038,"PNA":0.9383333333},{"Year":1977,"FourRivers":5.12,"LeesFerry":5629636,"PNA":0.2216666667}];
 	var test = new Engine(3);
 
+    function zoomer(d) {
+        // Called when zoom events are triggered. Transitions if zoom, not if panned.
+        var k_time = test.time_key;
+        var xScale = test.seriesPlotXScale;
+        var durationtime = 200;
+        var t = d3.event.translate;
+        var s = d3.event.scale;
+        t[0] = Math.min(0, Math.max(test.seriesPlotDimensions.width * (1 - s), t[0]));            
+        test.zoom.translate(t);
+        if (s == test.previousScale) {
+            test.seriesPlotSvg.select("#timelineplotspace")
+                .select(".axis.x")
+                .call(test.seriesPlotXAxis);
+            // test.seriesPlotSvg.selectAll(".lineplotcircle")
+            //     .attr("cx", function(d) { return xScale(d[k_time]); });
+            // for (i in test.var_keys) {
+            //     var k = test.var_keys[i];
+            //     test.seriesPlotSvg.select(".lineplotpath." + k)
+            //         .attr("d", test.seriesPlotLines[k](test.dataset));
+            // }
+        } else {
+            test.seriesPlotSvg.select("#timelineplotspace")
+                .select(".axis.x")
+                .transition()
+                .duration(durationtime)
+                .call(test.seriesPlotXAxis);
+            // test.seriesPlotSvg.selectAll(".lineplotcircle")
+            //     .transition()
+            //     .duration(durationtime)
+            //     .attr("cx", function(d) { return xScale(d[k_time]); });
+            // for (i in test.var_keys) {
+            //     var k = test.var_keys[i];
+            //     test.seriesPlotSvg.select(".lineplotpath." + k)
+            //         .transition()
+            //         .duration(durationtime)
+            //         .attr("d", test.seriesPlotLines[k](test.dataset));
+            // }
+        }
+        test.previousScale = s;
+    }
+
+    function dragger(d) {
+        // Called whenever drag events are fired. Intended to work on filterSvg circles.
+        if (d3.select(this).attr("class").indexOf("FourRivers") !== -1) {
+            if (d3.select(this).attr("class").indexOf("high") !== -1) {
+                test.setHighFilter(test.seriesPlotYScales["FourRivers"].invert(parseFloat(d3.event.y)), "FourRivers", d.filterYear);
+                d3.select(this)
+                    .attr("cy", function(d) {
+                        return test.seriesPlotYScales["FourRivers"](d["FourRivers"].high);
+                    })
+                    .select("title")
+                    .text(function(d) {
+                        return d["FourRivers"].high + " (" + d["filterYear"] + ")";
+                    });
+                test.filterPlotSvg.select(".series.FourRivers").select(".chart").selectAll("line")
+                    .attr("y1", function(d) {
+                        return test.seriesPlotYScales["FourRivers"](d["FourRivers"].low);
+                    })
+                    .attr("x2", function(d) {
+                        return test.filterPlotXScale(d["filterYear"]);
+                    })
+                    .attr("y2", function(d) {
+                        return test.seriesPlotYScales["FourRivers"](d["FourRivers"].high);
+                    })
+                    .attr("x1", function(d) {
+                        return test.filterPlotXScale(d["filterYear"]);
+                    });
+            } else if (d3.select(this).attr("class").indexOf("low") !== -1) {
+                test.setLowFilter(test.seriesPlotYScales["FourRivers"].invert(parseFloat(d3.event.y)), "FourRivers", d.filterYear);
+                d3.select(this)
+                    .attr("cy", function(d) {
+                        return test.seriesPlotYScales["FourRivers"](d["FourRivers"].low);
+                    })
+                    .select("title")
+                    .text(function(d) {
+                        return d["FourRivers"].low + " (" + d["filterYear"] + ")";
+                    });
+                test.filterPlotSvg.select(".series.FourRivers").select(".chart").selectAll("line")
+                    .attr("y1", function(d) {
+                        return test.seriesPlotYScales["FourRivers"](d["FourRivers"].low);
+                    })
+                    .attr("x2", function(d) {
+                        return test.filterPlotXScale(d["filterYear"]);
+                    })
+                    .attr("y2", function(d) {
+                        return test.seriesPlotYScales["FourRivers"](d["FourRivers"].high);
+                    })
+                    .attr("x1", function(d) {
+                        return test.filterPlotXScale(d["filterYear"]);
+                    });                 
+            }
+        } else if (d3.select(this).attr("class").indexOf("LeesFerry") !== -1) {
+            if (d3.select(this).attr("class").indexOf("high") !== -1) {
+                test.setHighFilter(test.seriesPlotYScales["LeesFerry"].invert(parseFloat(d3.event.y)), "LeesFerry", d.filterYear);
+                d3.select(this)
+                    .attr("cy", function(d) {
+                        return test.seriesPlotYScales["LeesFerry"](d["LeesFerry"].high);
+                    })
+                    .select("title")
+                    .text(function(d) {
+                        return d["LeesFerry"].high + " (" + d["filterYear"] + ")";
+                    });
+                test.filterPlotSvg.select(".series.LeesFerry").select(".chart").selectAll("line")
+                    .attr("y1", function(d) {
+                        return test.seriesPlotYScales["LeesFerry"](d["LeesFerry"].low);
+                    })
+                    .attr("x2", function(d) {
+                        return test.filterPlotXScale(d["filterYear"]);
+                    })
+                    .attr("y2", function(d) {
+                        return test.seriesPlotYScales["LeesFerry"](d["LeesFerry"].high);
+                    })
+                    .attr("x1", function(d) {
+                        return test.filterPlotXScale(d["filterYear"]);
+                    });
+            } else if (d3.select(this).attr("class").indexOf("low") !== -1) {
+                test.setLowFilter(test.seriesPlotYScales["LeesFerry"].invert(parseFloat(d3.event.y)), "LeesFerry", d.filterYear);
+                d3.select(this)
+                    .attr("cy", function(d) {
+                        return test.seriesPlotYScales["LeesFerry"](d["LeesFerry"].low);
+                    })
+                    .select("title")
+                    .text(function(d) {
+                        return d["LeesFerry"].low + " (" + d["filterYear"] + ")";
+                    });
+                test.filterPlotSvg.select(".series.LeesFerry").select(".chart").selectAll("line")
+                    .attr("y1", function(d) {
+                        return test.seriesPlotYScales["LeesFerry"](d["LeesFerry"].low);
+                    })
+                    .attr("x2", function(d) {
+                        return test.filterPlotXScale(d["filterYear"]);
+                    })
+                    .attr("y2", function(d) {
+                        return test.seriesPlotYScales["LeesFerry"](d["LeesFerry"].high);
+                    })
+                    .attr("x1", function(d) {
+                        return test.filterPlotXScale(d["filterYear"]);
+                    });                 
+            }
+        } else if (d3.select(this).attr("class").indexOf("PNA") !== -1) {
+            if (d3.select(this).attr("class").indexOf("high") !== -1) {
+                test.setHighFilter(test.seriesPlotYScales["PNA"].invert(parseFloat(d3.event.y)), "PNA", d.filterYear);
+                d3.select(this)
+                    .attr("cy", function(d) {
+                        return test.seriesPlotYScales["PNA"](d["PNA"].high);
+                    })
+                    .select("title")
+                    .text(function(d) {
+                        return d["PNA"].high + " (" + d["filterYear"] + ")";
+                    });
+                test.filterPlotSvg.select(".series.PNA").select(".chart").selectAll("line")
+                    .attr("y1", function(d) {
+                        return test.seriesPlotYScales["PNA"](d["PNA"].low);
+                    })
+                    .attr("x2", function(d) {
+                        return test.filterPlotXScale(d["filterYear"]);
+                    })
+                    .attr("y2", function(d) {
+                        return test.seriesPlotYScales["PNA"](d["PNA"].high);
+                    })
+                    .attr("x1", function(d) {
+                        return test.filterPlotXScale(d["filterYear"]);
+                    });
+            } else if (d3.select(this).attr("class").indexOf("low") !== -1) {
+                test.setLowFilter(test.seriesPlotYScales["PNA"].invert(parseFloat(d3.event.y)), "PNA", d.filterYear);
+                d3.select(this)
+                    .attr("cy", function(d) {
+                        return test.seriesPlotYScales["PNA"](d["PNA"].low);
+                    })
+                    .select("title")
+                    .text(function(d) {
+                        return d["PNA"].low + " (" + d["filterYear"] + ")";
+                    });
+                test.filterPlotSvg.select(".series.PNA").select(".chart").selectAll("line")
+                    .attr("y1", function(d) {
+                        return test.seriesPlotYScales["PNA"](d["PNA"].low);
+                    })
+                    .attr("x2", function(d) {
+                        return test.filterPlotXScale(d["filterYear"]);
+                    })
+                    .attr("y2", function(d) {
+                        return test.seriesPlotYScales["PNA"](d["PNA"].high);
+                    })
+                    .attr("x1", function(d) {
+                        return test.filterPlotXScale(d["filterYear"]);
+                    });                 
+            }
+        } else {
+            console.log("SCRIPT ERROR: Something went wrong with filter dragging.");
+        }
+        test.refilter();
+    }
+
+
 	test.setSeriesPlotWidth(660);
 	test.setSeriesPlotHeight(300);
 	test.setSeriesPlotTicks(5);
