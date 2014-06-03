@@ -4,7 +4,7 @@
 	<meta charset="utf-8">
 	<link rel="stylesheet" href="style.css" type="text/css">
 	<title>lookup</title>
-	<script src="d3.v3.min.js", type="text/javascript"></script>
+	<script src="d3.min.js", type="text/javascript"></script>
 	<script src="lookup.js" type="text/javascript"></script>
 </head>
 
@@ -68,6 +68,7 @@
 
     function dragger(d) {
         // Called whenever drag events are fired. Intended to work on filterSvg circles.
+        console.log(this);  // DEBUG
         if (d3.select(this).attr("class").indexOf("FourRivers") !== -1) {
             if (d3.select(this).attr("class").indexOf("high") !== -1) {
                 test.setHighFilter(test.seriesPlotYScales["FourRivers"].invert(parseFloat(d3.event.y)), "FourRivers", d.filterYear);
@@ -236,7 +237,7 @@
     test.setHistPlotMargin({top: 20, right: 50, bottom: 20, left: 150});
 
 
-    var dataset = [];  // DEBUG
+    // var dataset = [];  // DEBUG
     d3.csv("riverclimate.json", function(error, data) {
          // TODO: Still need some error catching here.
          if (error) {

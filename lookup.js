@@ -176,6 +176,7 @@ Engine.prototype = {
             var kScale = this.seriesPlotYScales[k];
             var xScale = this.seriesPlotXScale;
             this.seriesPlotLines[k] = d3.svg.line()
+                .defined(function(d) { return d[k] != null; })  // Avoid `null` values.
                 .x(function(d) { return xScale(d[k_time]); })
                 .y(function(d) { return kScale(d[k]); });
             this.seriesPlotSvg.select("#timelineplotspace").append("g")
@@ -194,7 +195,7 @@ Engine.prototype = {
                 .attr("class", "lineplot lineplotpath " + k)
                 .attr("d", this.seriesPlotLines[k](this.dataset));
             this.seriesPlotSvg.select(".series." + k).select(".chart").selectAll("circle")
-                .data(dataset)
+                .data(dataset.filter(function(d) { return d[k] }))  // Avoid `null` values.
                 .enter()
                 .append("circle")
                 .attr("class", "lineplot lineplotcircle " + k)
