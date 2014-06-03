@@ -68,154 +68,26 @@
 
     function dragger(d) {
         // Called whenever drag events are fired. Intended to work on filterSvg circles.
-        console.log(this);  // DEBUG
-        if (d3.select(this).attr("class").indexOf("FourRivers") !== -1) {
-            if (d3.select(this).attr("class").indexOf("high") !== -1) {
-                test.setHighFilter(test.seriesPlotYScales["FourRivers"].invert(parseFloat(d3.event.y)), "FourRivers", d.filterYear);
-                d3.select(this)
-                    .attr("cy", function(d) {
-                        return test.seriesPlotYScales["FourRivers"](d["FourRivers"].high);
-                    })
-                    .select("title")
-                    .text(function(d) {
-                        return d["FourRivers"].high + " (" + d["filterYear"] + ")";
-                    });
-                test.filterPlotSvg.select(".series.FourRivers").select(".chart").selectAll("line")
-                    .attr("y1", function(d) {
-                        return test.seriesPlotYScales["FourRivers"](d["FourRivers"].low);
-                    })
-                    .attr("x2", function(d) {
-                        return test.filterPlotXScale(d["filterYear"]);
-                    })
-                    .attr("y2", function(d) {
-                        return test.seriesPlotYScales["FourRivers"](d["FourRivers"].high);
-                    })
-                    .attr("x1", function(d) {
-                        return test.filterPlotXScale(d["filterYear"]);
-                    });
-            } else if (d3.select(this).attr("class").indexOf("low") !== -1) {
-                test.setLowFilter(test.seriesPlotYScales["FourRivers"].invert(parseFloat(d3.event.y)), "FourRivers", d.filterYear);
-                d3.select(this)
-                    .attr("cy", function(d) {
-                        return test.seriesPlotYScales["FourRivers"](d["FourRivers"].low);
-                    })
-                    .select("title")
-                    .text(function(d) {
-                        return d["FourRivers"].low + " (" + d["filterYear"] + ")";
-                    });
-                test.filterPlotSvg.select(".series.FourRivers").select(".chart").selectAll("line")
-                    .attr("y1", function(d) {
-                        return test.seriesPlotYScales["FourRivers"](d["FourRivers"].low);
-                    })
-                    .attr("x2", function(d) {
-                        return test.filterPlotXScale(d["filterYear"]);
-                    })
-                    .attr("y2", function(d) {
-                        return test.seriesPlotYScales["FourRivers"](d["FourRivers"].high);
-                    })
-                    .attr("x1", function(d) {
-                        return test.filterPlotXScale(d["filterYear"]);
-                    });                 
-            }
-        } else if (d3.select(this).attr("class").indexOf("LeesFerry") !== -1) {
-            if (d3.select(this).attr("class").indexOf("high") !== -1) {
-                test.setHighFilter(test.seriesPlotYScales["LeesFerry"].invert(parseFloat(d3.event.y)), "LeesFerry", d.filterYear);
-                d3.select(this)
-                    .attr("cy", function(d) {
-                        return test.seriesPlotYScales["LeesFerry"](d["LeesFerry"].high);
-                    })
-                    .select("title")
-                    .text(function(d) {
-                        return d["LeesFerry"].high + " (" + d["filterYear"] + ")";
-                    });
-                test.filterPlotSvg.select(".series.LeesFerry").select(".chart").selectAll("line")
-                    .attr("y1", function(d) {
-                        return test.seriesPlotYScales["LeesFerry"](d["LeesFerry"].low);
-                    })
-                    .attr("x2", function(d) {
-                        return test.filterPlotXScale(d["filterYear"]);
-                    })
-                    .attr("y2", function(d) {
-                        return test.seriesPlotYScales["LeesFerry"](d["LeesFerry"].high);
-                    })
-                    .attr("x1", function(d) {
-                        return test.filterPlotXScale(d["filterYear"]);
-                    });
-            } else if (d3.select(this).attr("class").indexOf("low") !== -1) {
-                test.setLowFilter(test.seriesPlotYScales["LeesFerry"].invert(parseFloat(d3.event.y)), "LeesFerry", d.filterYear);
-                d3.select(this)
-                    .attr("cy", function(d) {
-                        return test.seriesPlotYScales["LeesFerry"](d["LeesFerry"].low);
-                    })
-                    .select("title")
-                    .text(function(d) {
-                        return d["LeesFerry"].low + " (" + d["filterYear"] + ")";
-                    });
-                test.filterPlotSvg.select(".series.LeesFerry").select(".chart").selectAll("line")
-                    .attr("y1", function(d) {
-                        return test.seriesPlotYScales["LeesFerry"](d["LeesFerry"].low);
-                    })
-                    .attr("x2", function(d) {
-                        return test.filterPlotXScale(d["filterYear"]);
-                    })
-                    .attr("y2", function(d) {
-                        return test.seriesPlotYScales["LeesFerry"](d["LeesFerry"].high);
-                    })
-                    .attr("x1", function(d) {
-                        return test.filterPlotXScale(d["filterYear"]);
-                    });                 
-            }
-        } else if (d3.select(this).attr("class").indexOf("PNA") !== -1) {
-            if (d3.select(this).attr("class").indexOf("high") !== -1) {
-                test.setHighFilter(test.seriesPlotYScales["PNA"].invert(parseFloat(d3.event.y)), "PNA", d.filterYear);
-                d3.select(this)
-                    .attr("cy", function(d) {
-                        return test.seriesPlotYScales["PNA"](d["PNA"].high);
-                    })
-                    .select("title")
-                    .text(function(d) {
-                        return d["PNA"].high + " (" + d["filterYear"] + ")";
-                    });
-                test.filterPlotSvg.select(".series.PNA").select(".chart").selectAll("line")
-                    .attr("y1", function(d) {
-                        return test.seriesPlotYScales["PNA"](d["PNA"].low);
-                    })
-                    .attr("x2", function(d) {
-                        return test.filterPlotXScale(d["filterYear"]);
-                    })
-                    .attr("y2", function(d) {
-                        return test.seriesPlotYScales["PNA"](d["PNA"].high);
-                    })
-                    .attr("x1", function(d) {
-                        return test.filterPlotXScale(d["filterYear"]);
-                    });
-            } else if (d3.select(this).attr("class").indexOf("low") !== -1) {
-                test.setLowFilter(test.seriesPlotYScales["PNA"].invert(parseFloat(d3.event.y)), "PNA", d.filterYear);
-                d3.select(this)
-                    .attr("cy", function(d) {
-                        return test.seriesPlotYScales["PNA"](d["PNA"].low);
-                    })
-                    .select("title")
-                    .text(function(d) {
-                        return d["PNA"].low + " (" + d["filterYear"] + ")";
-                    });
-                test.filterPlotSvg.select(".series.PNA").select(".chart").selectAll("line")
-                    .attr("y1", function(d) {
-                        return test.seriesPlotYScales["PNA"](d["PNA"].low);
-                    })
-                    .attr("x2", function(d) {
-                        return test.filterPlotXScale(d["filterYear"]);
-                    })
-                    .attr("y2", function(d) {
-                        return test.seriesPlotYScales["PNA"](d["PNA"].high);
-                    })
-                    .attr("x1", function(d) {
-                        return test.filterPlotXScale(d["filterYear"]);
-                    });                 
-            }
-        } else {
-            console.log("SCRIPT ERROR: Something went wrong with filter dragging.");
-        }
+        var classpool = d3.select(this).attr("class").split(" ");
+        // Find the series (`s`) and position (`p`; "high" or "low") being referenced.
+        var s = classpool.filter(function(e, i, a) { return test.var_keys.indexOf(e) != -1; })[0];
+        var p = classpool.filter(function(e, i, a) { return ["high", "low"].indexOf(e) != -1; })[0];
+        test.setHighFilter(test.seriesPlotYScales[s].invert(parseFloat(d3.event.y)), s, d.filterYear);
+        d3.select(this)
+            .attr("cy", function(d) {
+                return test.seriesPlotYScales[s](d[s][p]);
+            })
+            .select("title")
+            .text(function(d) {
+                return d[s][p] + " (" + d["filterYear"] + ")";
+            });
+        d3.select(".filterplotline." + s + "." + "fy" + d.filterYear)
+            .attr("y1", function(d) {
+                return test.seriesPlotYScales[s](d[s].low);
+            })
+            .attr("y2", function(d) {
+                return test.seriesPlotYScales[s](d[s].high);
+            });
         test.refilter();
     }
 

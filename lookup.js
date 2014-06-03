@@ -259,7 +259,7 @@ Engine.prototype = {
                 .data(this.filters)
                 .enter()
                 .append("line")
-                .attr("class", "filter filterplotline " + k)
+                .attr("class", function(d) { return "filter filterplotline " + k + " fy" + d[k_time]; })
                 .attr("y1", function(d) { return kScale(d[k].low); })
                 .attr("x2", function(d) { return xScale(d[k_time]); })
                 .attr("y2", function(d) { return kScale(d[k].high); })
