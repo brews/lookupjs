@@ -84,7 +84,14 @@
         // Find the series (`s`) and position (`p`; "high" or "low") being referenced.
         var s = classpool.filter(function(e, i, a) { return test.var_keys.indexOf(e) != -1; })[0];
         var p = classpool.filter(function(e, i, a) { return ["high", "low"].indexOf(e) != -1; })[0];
-        test.setHighFilter(test.seriesPlotYScales[s].invert(parseFloat(d3.event.y)), s, d.filterYear);
+        var v = test.seriesPlotYScales[s].invert(parseFloat(d3.event.y));
+        if (p == "high") {
+            test.setHighFilter(v, s, d.filterYear);
+        } else if (p == "low") {
+            test.setLowFilter(v, s, d.filterYear);
+        } else {
+            alert("Something went wrong with filter dragging.");
+        }
         d3.select(this)
             .attr("cy", function(d) {
                 return test.seriesPlotYScales[s](d[s][p]);
