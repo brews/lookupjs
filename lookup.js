@@ -426,17 +426,15 @@ Engine.prototype = {
     initFilters: function() {
         // Initialize filters after a dataset has been set.
         // A three year filter is set using the max and min values of each series.
-        var skeleton = {};
-        for (i in this.var_keys) {
-            var k = this.var_keys[i];
-            var range_body = {"high": d3.max(this.dataset, function(d) { return d[k]; }),
-                              "low":  d3.min(this.dataset, function(d) { return d[k]; })};
-            eval("skeleton." + this.var_keys[i] + " = " + "range_body");
-        }
-        for (i in range(this.filter_n)) {
-            var outgoing = Object.create(skeleton);
-            outgoing.filterYear = parseInt(i);
-            this.filters.push(outgoing);
+        for (var i in range(this.filter_n)) {
+            var skeleton = {};
+            for (var j in this.var_keys) {
+                var k = this.var_keys[j];
+                skeleton[k] = {"high": d3.max(this.dataset, function(d) { return d[k]; }),
+                               "low": d3.min(this.dataset, function(d) { return d[k]; })};
+            }
+            skeleton["filterYear"] = parseInt(i);
+            this.filters.push(skeleton);
         }
     },
 
@@ -560,7 +558,7 @@ Engine.prototype = {
         // `low`, etc...
         var i;
         for (i = 0; i < this.filters.length; i += 1) {
-            if (this.filters[i].filterYear === year) {
+            if (this.filters[i].filterYear == year) {
                 this.filters[i][series].high = x;
             }
         }

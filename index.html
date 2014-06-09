@@ -85,6 +85,7 @@
         var s = classpool.filter(function(e, i, a) { return test.var_keys.indexOf(e) != -1; })[0];
         var p = classpool.filter(function(e, i, a) { return ["high", "low"].indexOf(e) != -1; })[0];
         var v = test.seriesPlotYScales[s].invert(parseFloat(d3.event.y));
+        console.log(s + ", " + p + ", " + v + ", " + d.filterYear); // DEBUG
         if (p == "high") {
             test.setHighFilter(v, s, d.filterYear);
         } else if (p == "low") {
