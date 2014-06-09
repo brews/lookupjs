@@ -65,7 +65,7 @@ function Engine(n) {
     };
     this.histPlotXScale = d3.scale.linear();
     this.histPlotXAxis = d3.svg.axis();
-    this.filterPlotXScale = d3.scale.linear();
+    this.filterPlotXScale = d3.scale.ordinal();
     this.filterPlotXAxis = d3.svg.axis();
     this.seriesPlotXScale = d3.scale.linear();
     this.seriesPlotXAxis = d3.svg.axis();
@@ -483,11 +483,9 @@ Engine.prototype = {
             .range([0, this.seriesPlotDimensions.width]);
         this.zoom.x(this.seriesPlotXScale);
 
-        this.filterPlotXScale = d3.scale.linear();
-        this.filterPlotXScale.domain([d3.min(this.filters, function(d) { return d.filterYear; }),
-                                      d3.max(this.filters, function(d) { return d.filterYear; })])
-            .range([0, this.filterPlotDimensions.width])
-            .nice(this.filter_n);
+        this.filterPlotXScale = d3.scale.ordinal();
+        this.filterPlotXScale.domain(range(this.filter_n))
+            .rangePoints([0, this.filterPlotDimensions.width], 1.0);  // This last numer is for the scale padding.
 
         this.histPlotXScale = d3.scale.linear();
         this.histPlotXScale.domain([0, this.dataset.length])
