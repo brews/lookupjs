@@ -27,41 +27,53 @@
 
     function zoomer(d) {
         // Called when zoom events are triggered. Transitions if zoom, not if panned.
+        // TODO: This is very poorly done. It would be great to clean it up and
+        //       get this functionality into lookup.js.
         var k_time = test.time_key;
         var xScale = test.seriesPlotXScale;
         var durationtime = 200;
         var t = d3.event.translate;
         var s = d3.event.scale;
-        t[0] = Math.min(0, Math.max(test.seriesPlotDimensions.width * (1 - s), t[0]));            
         test.zoom.translate(t);
         if (s == test.previousScale) {
             test.seriesPlotSvg.select("#timelineplotspace")
                 .select(".axis.x")
                 .call(test.seriesPlotXAxis);
-            // test.seriesPlotSvg.selectAll(".lineplotcircle")
-            //     .attr("cx", function(d) { return xScale(d[k_time]); });
-            // for (i in test.var_keys) {
-            //     var k = test.var_keys[i];
-            //     test.seriesPlotSvg.select(".lineplotpath." + k)
-            //         .attr("d", test.seriesPlotLines[k](test.dataset));
-            // }
+            for (var i in test.var_keys) {
+                var k = test.var_keys[i];
+                var kScale = test.seriesPlotYScales[k];
+                test.seriesPlotLines[k] = d3.svg.line()
+                    .defined(function(d) { return d[k] != null; })  // Avoid `null` values.
+                    .x(function(d) { return xScale(d[k_time]); })
+                    .y(function(d) { return kScale(d[k]); });
+                test.seriesPlotSvg.selectAll(".lineplotcircle")
+                    .attr("cx", function(d) { return xScale(d[k_time]); });
+                test.seriesPlotSvg.select(".lineplotpath." + k)
+                    .attr("d", test.seriesPlotLines[k](test.dataset));
+            }
+
         } else {
             test.seriesPlotSvg.select("#timelineplotspace")
                 .select(".axis.x")
                 .transition()
                 .duration(durationtime)
                 .call(test.seriesPlotXAxis);
-            // test.seriesPlotSvg.selectAll(".lineplotcircle")
-            //     .transition()
-            //     .duration(durationtime)
-            //     .attr("cx", function(d) { return xScale(d[k_time]); });
-            // for (i in test.var_keys) {
-            //     var k = test.var_keys[i];
-            //     test.seriesPlotSvg.select(".lineplotpath." + k)
-            //         .transition()
-            //         .duration(durationtime)
-            //         .attr("d", test.seriesPlotLines[k](test.dataset));
-            // }
+            for (var i in test.var_keys) {
+                var k = test.var_keys[i];
+                var kScale = test.seriesPlotYScales[k];
+                test.seriesPlotLines[k] = d3.svg.line()
+                    .defined(function(d) { return d[k] != null; })  // Avoid `null` values.
+                    .x(function(d) { return xScale(d[k_time]); })
+                    .y(function(d) { return kScale(d[k]); });
+                test.seriesPlotSvg.selectAll(".lineplotcircle")
+                    .transition()
+                    .duration(durationtime)
+                    .attr("cx", function(d) { return xScale(d[k_time]); });
+                test.seriesPlotSvg.select(".lineplotpath." + k)
+                    .transition()
+                    .duration(durationtime)
+                    .attr("d", test.seriesPlotLines[k](test.dataset));
+            }
         }
         test.previousScale = s;
     }
@@ -109,8 +121,7 @@
     test.setHistPlotMargin({top: 20, right: 50, bottom: 20, left: 150});
 
 
-    // var dataset = [];  // DEBUG
-    d3.csv("riverclimate.json", function(error, data) {
+    d3.csv("riverclimate2.json", function(error, data) {
          // TODO: Still need some error catching here.
          if (error) {
              console.log(error);

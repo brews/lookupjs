@@ -78,7 +78,7 @@ function Engine(n) {
     this.drag = d3.behavior.drag()
         .on("drag", dragger);
     this.zoom = d3.behavior.zoom()
-        .x(this.seriesPlotXScale)
+        .x(this.seriesPlotXScale)  // Note: Needs to be re-set everytime we change this xscale.
         .scaleExtent(this.zoomExtent)
         .on("zoom", zoomer);
 }
@@ -481,6 +481,7 @@ Engine.prototype = {
         this.seriesPlotXScale.domain([d3.min(this.dataset, function(d) { return d[k_time]; }),
                                       d3.max(this.dataset, function(d) { return d[k_time]; })])
             .range([0, this.seriesPlotDimensions.width]);
+        this.zoom.x(this.seriesPlotXScale);
 
         this.filterPlotXScale = d3.scale.linear();
         this.filterPlotXScale.domain([d3.min(this.filters, function(d) { return d.filterYear; }),
