@@ -40,11 +40,9 @@
       </header>
       <section>
         <h1>
-<a name="lookup" class="anchor" href="#lookup"><span class="octicon octicon-link"></span></a>California Water: Demo</h1>
+<a name="lookup" class="anchor" href="#lookup"><span class="octicon octicon-link"></span></a>Salt River Project: Percent of mean - Full</h1>
       </section>
       <section>
-        <p>Below is the first working prototype of lookup. It remains largely untested and still has many rough edges, though the major features are functional.</p>
-        <p>Three time series are in the charts shown. All of these series have been converted to percentiles. The top series is streamflow from the Four Rivers index in California, summing the flow in the Sacramento River. The second series is streamflow from the Lees Ferry gauge on the Colorado River. The final series, that on the bottom, is an idex measuring activity in the PNA pattern. A measure of atmospheric flow and position.</p>
         <p>The timeline chart can zoom in by double clicking on it, and zoom out by selecting the shift key and double clicking again. You can also use a mouse-wheel if you have one. The middle "filter" chart lets you define a range of values for three consecutive years in each of the series. You can do this by dragging each circle on the top and bottom end of the filters. After a filter has been changed, Lookup will find strings of years in the series where all of the filters have matches. The single year that follows this matched pattern is highlighted in orange in the timeline chart. You will also notice that the bottome "single-year histogram" summarizes the distribution of the single year that follows each matched pattern, for each series.</p>
         <p>Placing your mouse over any of the circles or bars in these charts will bring up a brief tool tip describing the feature.</p>
       </section>
@@ -186,7 +184,7 @@
     test.setHistPlotMargin({top: 20, right: 50, bottom: 20, left: 125});
 
 
-    d3.csv("plotdata/cdwrdemoP.json", function(error, data) {
+    d3.csv("plotdata/srppmeanfull.json", function(error, data) {
        // TODO: Still need some error catching here.
        if (error) {
            console.log(error);
@@ -206,7 +204,7 @@
               dataset[index] = outgoing;
            });
        // console.log(dataset); // DEBUG
-       test.setData(dataset, "Year");
+       test.setData(dataset, "WY");
        test.setSeriesPlotId("#timeline-chart");
        test.setFilterPlotId("#filter-chart");
        test.setHistPlotId("#yearhist-chart");
