@@ -28,6 +28,7 @@
           <small><a href="cdwrpaleoeqpac.html">Paleo Equatorial Pacific</a></small><br>
         </p>
 
+
         <p>Salt River Project:<br>
           <small>Raw data (<a href="srprawfull.html">Full</a>|<a href="srprawcrop.html">Crop</a>)</small><br>
           <small>Rank percentiles (<a href="srpprankfull.html">Full</a>|<a href="srpprankcrop.html">Crop</a>)</small><br>
@@ -45,30 +46,31 @@
       </header>
       <section>
         <h1>
-<a name="lookup" class="anchor" href="#lookup"><span class="octicon octicon-link"></span></a>Salt River Project: Rank percentiles - Full</h1>
+<a name="lookup" class="anchor" href="#lookup"><span class="octicon octicon-link"></span></a>California Department of Water Resources: Paleo-record Equatorial Pacific</h1>
       </section>
       <section>
-        <p>This is lookup for the Salt River Project.</p>
-        <p>Data is in units of ranked percentiles. This percentile is calculated using the full record length for each series. An exception to this is the ONI, which is in its original index units. The data used in the plot is described below.</p>
+        <p>This version of lookup focuses on patterns between paleo-reconstructions of the Sacramento River ("Sacramento"), the Colorado River ("LeesFerry"), and Equatorial Pacific sea surface temperature anomalies ("sst").</p>
+        <p>The data is described in detail below.</p>
       </section>
       <section>
         <div id="container">
           <div id="timeline-chart", class="charts">
-            <div class="title">timeline</div>
+            <div class="title"></div>
           </div>
           <div id="filter-chart", class="charts">
-            <div class="title">filter</div>
+            <div class="title"></div>
           </div>
           <div id="yearhist-chart", class="charts">
-            <div class="title">single-year histogram</div>
+            <div class="title"></div>
           </div>
         </div>
       </section>
       <section>
-        <p>"STVpcip" is Salt-Tonto-Verde watershed average precipitation from Dec-Mar. Data is from 2014-06-19 personal communication with Jonathan Skindlov.</p>
-        <p>"Reservoir" is the total inflow to SRP reservoirs from Dec-May. Data is from 2014-06-19 personal communication with Jonathan Skindlov.</p>
-        <p>"LeesFerry" is the total naturalized water-year flow of the Colorado River at Lee's Ferry. Data was downloaded from <a href="http://www.usbr.gov/lc/region/g4000/NaturalFlow/current.html">USBR</a> on 2014-07-02.</p>
-        <p>"ONI" is the Dec-Feb Oceanic Niño Index. Data was downloaded from <a href="http://www.esrl.noaa.gov/psd/data/climateindices/list/">NOAA</a> on 2014-07-02.</p>
+        <p>"Sacramento" is a tree-ring reconstructed time series of <a href="http://en.wikipedia.org/wiki/Sacramento_River">Sacramento River</a> <a href="http://water.usgs.gov/nwc/explain_data.html">water year</a> natural streamflow (<a href="http://dx.doi.org/10.1111/j.1752-1688.2001.tb05530.x">Meko et al. 2001</a>). The data has been transformed into rank-percentiles. See <a href="http://treeflow.info/cali/sacramentofour.html">here</a> for further discussion.</p>
+
+        <p>"LeesFerry" is a tree-ring reconstructed time series of  <a href="http://water.usgs.gov/nwc/explain_data.html">water year</a> <a href="http://en.wikipedia.org/wiki/Colorado_River">Colorado River</a> natural streamflow at Lee's Ferry (<a href="http://dx.doi.org/10.1029/2007GL029988">Meko et al. 2007</a>). The data has been transformed into rank-percentiles. See <a href="http://treeflow.info/upco/coloradoleesmeko.html">here</a> for further discussion.</p>
+
+        <p>"sst" is a tree-ring reconstruction of the <a href="http://en.wikipedia.org/wiki/El_Ni%C3%B1o_Southern_Oscillation">ENSO</a> <a href="http://www.ncdc.noaa.gov/teleconnections/enso/indicators/sst.php">Niño 3.4 Index</a> (<a href="http://dx.doi.org/10.1038/nclimate1936">Li et al. 2013</a>). This index measures <a href="http://en.wikipedia.org/wiki/El_Ni%C3%B1o_Southern_Oscillation">ENSO variability</a>. The data has been transformed into rank-percentiles.</p>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/brews">brews</a></p>
@@ -195,7 +197,7 @@
     test.setHistPlotMargin({top: 20, right: 50, bottom: 20, left: 125});
 
 
-    d3.csv("plotdata/srpprankfull.json", function(error, data) {
+    d3.csv("plotdata/cdwrpaleosst.json", function(error, data) {
        // TODO: Still need some error catching here.
        if (error) {
            console.log(error);
@@ -215,7 +217,7 @@
               dataset[index] = outgoing;
            });
        // console.log(dataset); // DEBUG
-       test.setData(dataset, "WY");
+       test.setData(dataset, "Year");
        test.setSeriesPlotId("#timeline-chart");
        test.setFilterPlotId("#filter-chart");
        test.setHistPlotId("#yearhist-chart");

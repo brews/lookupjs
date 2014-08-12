@@ -28,6 +28,7 @@
           <small><a href="cdwrpaleoeqpac.html">Paleo Equatorial Pacific</a></small><br>
         </p>
 
+
         <p>Salt River Project:<br>
           <small>Raw data (<a href="srprawfull.html">Full</a>|<a href="srprawcrop.html">Crop</a>)</small><br>
           <small>Rank percentiles (<a href="srpprankfull.html">Full</a>|<a href="srpprankcrop.html">Crop</a>)</small><br>
@@ -45,11 +46,10 @@
       </header>
       <section>
         <h1>
-<a name="lookup" class="anchor" href="#lookup"><span class="octicon octicon-link"></span></a>Salt River Project: Rank percentiles - Full</h1>
+<a name="lookup" class="anchor" href="#lookup"><span class="octicon octicon-link"></span></a>California Water: Demo</h1>
       </section>
       <section>
-        <p>This is lookup for the Salt River Project.</p>
-        <p>Data is in units of ranked percentiles. This percentile is calculated using the full record length for each series. An exception to this is the ONI, which is in its original index units. The data used in the plot is described below.</p>
+        <p>This section is under construction.
       </section>
       <section>
         <div id="container">
@@ -64,15 +64,9 @@
           </div>
         </div>
       </section>
-      <section>
-        <p>"STVpcip" is Salt-Tonto-Verde watershed average precipitation from Dec-Mar. Data is from 2014-06-19 personal communication with Jonathan Skindlov.</p>
-        <p>"Reservoir" is the total inflow to SRP reservoirs from Dec-May. Data is from 2014-06-19 personal communication with Jonathan Skindlov.</p>
-        <p>"LeesFerry" is the total naturalized water-year flow of the Colorado River at Lee's Ferry. Data was downloaded from <a href="http://www.usbr.gov/lc/region/g4000/NaturalFlow/current.html">USBR</a> on 2014-07-02.</p>
-        <p>"ONI" is the Dec-Feb Oceanic Niño Index. Data was downloaded from <a href="http://www.esrl.noaa.gov/psd/data/climateindices/list/">NOAA</a> on 2014-07-02.</p>
-      </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/brews">brews</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Modified from theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
       </footer>
     </div>
     <script src="javascripts/scale.fix.js"></script>
@@ -195,7 +189,7 @@
     test.setHistPlotMargin({top: 20, right: 50, bottom: 20, left: 125});
 
 
-    d3.csv("plotdata/srpprankfull.json", function(error, data) {
+    d3.csv("plotdata/cdwrdemoP.json", function(error, data) {
        // TODO: Still need some error catching here.
        if (error) {
            console.log(error);
@@ -215,7 +209,7 @@
               dataset[index] = outgoing;
            });
        // console.log(dataset); // DEBUG
-       test.setData(dataset, "WY");
+       test.setData(dataset, "Year");
        test.setSeriesPlotId("#timeline-chart");
        test.setFilterPlotId("#filter-chart");
        test.setHistPlotId("#yearhist-chart");

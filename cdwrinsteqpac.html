@@ -18,7 +18,6 @@
       <header>
         <h1>lookup</h1>
         <p>A tool to visually match short patterns across multiple time series. This is the HTML implementation.</p>
-
         <p><a href="tutorial.html">Tutorial</a></p>
         
         <p>California Department of Water Resources:<br>
@@ -45,30 +44,33 @@
       </header>
       <section>
         <h1>
-<a name="lookup" class="anchor" href="#lookup"><span class="octicon octicon-link"></span></a>Salt River Project: Rank percentiles - Full</h1>
+<a name="lookup" class="anchor" href="#lookup"><span class="octicon octicon-link"></span></a>California Department of Water Resources: Equatorial Pacific</h1>
       </section>
       <section>
-        <p>This is lookup for the Salt River Project.</p>
-        <p>Data is in units of ranked percentiles. This percentile is calculated using the full record length for each series. An exception to this is the ONI, which is in its original index units. The data used in the plot is described below.</p>
+        <p>This version of lookup focuses on patterns between the Sacramento River ("Sacramento"), the Colorado River ("LeesFerry"), spring bivariate ENSO index ("EnsoMAM"), and winter bivariate ENSO index ("EnsoDJF").</p>
+        <p>The data is described in detail below.</p>
       </section>
       <section>
         <div id="container">
           <div id="timeline-chart", class="charts">
-            <div class="title">timeline</div>
+            <div class="title"></div>
           </div>
           <div id="filter-chart", class="charts">
-            <div class="title">filter</div>
+            <div class="title"></div>
           </div>
           <div id="yearhist-chart", class="charts">
-            <div class="title">single-year histogram</div>
+            <div class="title"></div>
           </div>
         </div>
       </section>
       <section>
-        <p>"STVpcip" is Salt-Tonto-Verde watershed average precipitation from Dec-Mar. Data is from 2014-06-19 personal communication with Jonathan Skindlov.</p>
-        <p>"Reservoir" is the total inflow to SRP reservoirs from Dec-May. Data is from 2014-06-19 personal communication with Jonathan Skindlov.</p>
-        <p>"LeesFerry" is the total naturalized water-year flow of the Colorado River at Lee's Ferry. Data was downloaded from <a href="http://www.usbr.gov/lc/region/g4000/NaturalFlow/current.html">USBR</a> on 2014-07-02.</p>
-        <p>"ONI" is the Dec-Feb Oceanic Niño Index. Data was downloaded from <a href="http://www.esrl.noaa.gov/psd/data/climateindices/list/">NOAA</a> on 2014-07-02.</p>
+       <p>"Sacramento" is a <a href="http://water.usgs.gov/nwc/explain_data.html">water year</a> time series of unimpaired runoff, or full natural flow, for the <a href="http://en.wikipedia.org/wiki/Sacramento_River">Sacramento River</a>. The data has been transformed into rank-percentiles. The series is the sum of natural flow from four river gauges: <a href="http://cdec.water.ca.gov/cgi-progs/staMeta?station_id=BND">Sacramento River at Bend Bridge</a>, <a href="http://cdec.water.ca.gov/cgi-progs/staMeta?station_id=FTO">Feather River at Oroville</a>, <a href="http://cdec.water.ca.gov/cgi-progs/staMeta?station_id=YRS">Yuba River near Smartville</a>, and <a href="http://cdec.water.ca.gov/cgi-progs/staMeta?station_id=AMF">American River at Folsom Lake</a>. This index is also known as the "Four River Index" or "Four Basin Index".</p>
+
+        <p>"LeesFerry" is a <a href="http://water.usgs.gov/nwc/explain_data.html">water year</a> time series of  natural flow for the <a href="http://en.wikipedia.org/wiki/Colorado_River">Colorado River</a>. The data has been transformed into rank-percentiles. The data is calculated from the Lee's Ferry river gauge. This gauge measures the Colorado River streamflow from the Upper Colorado River basin. <a href="http://www.usbr.gov/lc/region/g4000/NaturalFlow/documentation.html">Source</a>.</p>
+
+        <p>"EnsoMAM" is the Bivariate ENSO Timeseries (BEST) from March through May (<a href="http://dx.doi.org/10.1002/1097-0088(20001115)20:13<1543::AID-JOC579>3.0.CO;2-A">Smith and Sardeshmukh 2000</a>). This index measures <a href="http://en.wikipedia.org/wiki/El_Ni%C3%B1o_Southern_Oscillation">ENSO variability</a>. See <a href="http://www.esrl.noaa.gov/psd/people/cathy.smith/best/">here</a> for further discussion.</p>
+
+        <p>"EnsoDJF" is the Bivariate ENSO Timeseries (BEST) from December through February (<a href="http://dx.doi.org/10.1002/1097-0088(20001115)20:13<1543::AID-JOC579>3.0.CO;2-A">Smith and Sardeshmukh 2000</a>). This index measures <a href="http://en.wikipedia.org/wiki/El_Ni%C3%B1o_Southern_Oscillation">ENSO variability</a>. See <a href="http://www.esrl.noaa.gov/psd/people/cathy.smith/best/">here</a> for further discussion.</p>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/brews">brews</a></p>
@@ -195,7 +197,7 @@
     test.setHistPlotMargin({top: 20, right: 50, bottom: 20, left: 125});
 
 
-    d3.csv("plotdata/srpprankfull.json", function(error, data) {
+    d3.csv("plotdata/cdwrinstenso.json", function(error, data) {
        // TODO: Still need some error catching here.
        if (error) {
            console.log(error);
@@ -215,7 +217,7 @@
               dataset[index] = outgoing;
            });
        // console.log(dataset); // DEBUG
-       test.setData(dataset, "WY");
+       test.setData(dataset, "Year");
        test.setSeriesPlotId("#timeline-chart");
        test.setFilterPlotId("#filter-chart");
        test.setHistPlotId("#yearhist-chart");

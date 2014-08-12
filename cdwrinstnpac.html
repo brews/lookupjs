@@ -28,6 +28,7 @@
           <small><a href="cdwrpaleoeqpac.html">Paleo Equatorial Pacific</a></small><br>
         </p>
 
+
         <p>Salt River Project:<br>
           <small>Raw data (<a href="srprawfull.html">Full</a>|<a href="srprawcrop.html">Crop</a>)</small><br>
           <small>Rank percentiles (<a href="srpprankfull.html">Full</a>|<a href="srpprankcrop.html">Crop</a>)</small><br>
@@ -45,30 +46,33 @@
       </header>
       <section>
         <h1>
-<a name="lookup" class="anchor" href="#lookup"><span class="octicon octicon-link"></span></a>Salt River Project: Rank percentiles - Full</h1>
+<a name="lookup" class="anchor" href="#lookup"><span class="octicon octicon-link"></span></a>California Department of Water Resources: North Pacific</h1>
       </section>
       <section>
-        <p>This is lookup for the Salt River Project.</p>
-        <p>Data is in units of ranked percentiles. This percentile is calculated using the full record length for each series. An exception to this is the ONI, which is in its original index units. The data used in the plot is described below.</p>
+        <p>This version of lookup focuses on patterns between the Sacramento River ("Sacramento"), the Colorado River ("LeesFerry"), North Pacific Index anomalies ("NPI"), and the Aleutian Low Pressure Index ("ALPI").</p>
+        <p>The data is described in detail below.</p>
       </section>
       <section>
         <div id="container">
           <div id="timeline-chart", class="charts">
-            <div class="title">timeline</div>
+            <div class="title"></div>
           </div>
           <div id="filter-chart", class="charts">
-            <div class="title">filter</div>
+            <div class="title"></div>
           </div>
           <div id="yearhist-chart", class="charts">
-            <div class="title">single-year histogram</div>
+            <div class="title"></div>
           </div>
         </div>
       </section>
       <section>
-        <p>"STVpcip" is Salt-Tonto-Verde watershed average precipitation from Dec-Mar. Data is from 2014-06-19 personal communication with Jonathan Skindlov.</p>
-        <p>"Reservoir" is the total inflow to SRP reservoirs from Dec-May. Data is from 2014-06-19 personal communication with Jonathan Skindlov.</p>
-        <p>"LeesFerry" is the total naturalized water-year flow of the Colorado River at Lee's Ferry. Data was downloaded from <a href="http://www.usbr.gov/lc/region/g4000/NaturalFlow/current.html">USBR</a> on 2014-07-02.</p>
-        <p>"ONI" is the Dec-Feb Oceanic Niño Index. Data was downloaded from <a href="http://www.esrl.noaa.gov/psd/data/climateindices/list/">NOAA</a> on 2014-07-02.</p>
+        <p>"Sacramento" is a <a href="http://water.usgs.gov/nwc/explain_data.html">water year</a> time series of unimpaired runoff, or full natural flow, for the <a href="http://en.wikipedia.org/wiki/Sacramento_River">Sacramento River</a>. The data has been transformed into rank-percentiles. The series is the sum of natural flow from four river gauges: <a href="http://cdec.water.ca.gov/cgi-progs/staMeta?station_id=BND">Sacramento River at Bend Bridge</a>, <a href="http://cdec.water.ca.gov/cgi-progs/staMeta?station_id=FTO">Feather River at Oroville</a>, <a href="http://cdec.water.ca.gov/cgi-progs/staMeta?station_id=YRS">Yuba River near Smartville</a>, and <a href="http://cdec.water.ca.gov/cgi-progs/staMeta?station_id=AMF">American River at Folsom Lake</a>. This index is also known as the "Four River Index" or "Four Basin Index".</p>
+
+        <p>"LeesFerry" is a <a href="http://water.usgs.gov/nwc/explain_data.html">water year</a> time series of  natural flow for the <a href="http://en.wikipedia.org/wiki/Colorado_River">Colorado River</a>. The data has been transformed into rank-percentiles. The data is calculated from the Lee's Ferry river gauge. This gauge measures the Colorado River streamflow from the Upper Colorado River basin. <a href="http://www.usbr.gov/lc/region/g4000/NaturalFlow/documentation.html">Source</a>.</p>
+
+        <p>"ALPI" is the Aleutian Low Pressure Index from December through March (<a href="http://dx.doi.org/10.1139/f96-310">Beamish et al. 1997</a>, Beamish et al. 2000). This index measures the size of the <a href="http://en.wikipedia.org/wiki/Aleutian_Low">Aleutian Low</a>.</p>
+
+        <p>"NPI" are North Pacific Index anomalies from November through March (<a href="http://dx.doi.org/10.1007/BF00204745">Trenberth and Hurrell 1994</a>). The index is the area-weighted sea-level pressure of the <a href="http://en.wikipedia.org/wiki/Aleutian_Low">Aleutian Low</a>. See <a href="https://climatedataguide.ucar.edu/climate-data/north-pacific-np-index-trenberth-and-hurrell-monthly-and-winter">here</a> for further discussion.</p>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/brews">brews</a></p>
@@ -195,7 +199,7 @@
     test.setHistPlotMargin({top: 20, right: 50, bottom: 20, left: 125});
 
 
-    d3.csv("plotdata/srpprankfull.json", function(error, data) {
+    d3.csv("plotdata/cdwrinstpi.json", function(error, data) {
        // TODO: Still need some error catching here.
        if (error) {
            console.log(error);
@@ -215,7 +219,7 @@
               dataset[index] = outgoing;
            });
        // console.log(dataset); // DEBUG
-       test.setData(dataset, "WY");
+       test.setData(dataset, "Year");
        test.setSeriesPlotId("#timeline-chart");
        test.setFilterPlotId("#filter-chart");
        test.setHistPlotId("#yearhist-chart");
