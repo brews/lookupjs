@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Lookupjs by brews</title>
+    <title>simple example - lookup tutorial</title>
 
     <link rel="stylesheet" href="stylesheets/styles.css">
     <link rel="stylesheet" href="stylesheets/pygment_trac.css">
@@ -14,80 +14,31 @@
     <![endif]-->
   </head>
   <body>
-    <div class="wrapper">
+    <div>
       <header>
-        <h1>lookup</h1>
-        <p>A tool to visually match short patterns across multiple time series. This is the HTML implementation.</p>
-
-        <p><a href="https://github.com/brews/lookupjs/wiki/Tutorial">Tutorial</a></p>
-        
-        <p>California Department of Water Resources:<br>
-          <small><a href="cdwrinstnpac.html">North Pacific</a></small><br>
-          <small><a href="cdwrinsteqpac.html">Equatorial Pacific</a></small><br>
-          <small><a href="cdwrpaleonpac.html">Paleo North Pacific</a></small><br>
-          <small><a href="cdwrpaleoeqpac.html">Paleo Equatorial Pacific</a></small><br>
-        </p>
-
-        <p>Salt River Project:<br>
-          <small>Raw data (<a href="srprawfull.html">Full</a>|<a href="srprawcrop.html">Crop</a>)</small><br>
-          <small>Rank percentiles (<a href="srpprankfull.html">Full</a>|<a href="srpprankcrop.html">Crop</a>)</small><br>
-          <small>Percent of mean (<a href="srppmeanfull.html">Full</a>|<a href="srppmeancrop.html">Crop</a>)</small>
-        </p>
-
-        <p class="view"><a href="https://github.com/brews/lookupjs">View the Project on GitHub <small>brews/lookupjs</small></a></p>
-
-        <ul>
-          <li><a href="https://github.com/brews/lookupjs/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/brews/lookupjs/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/brews/lookupjs">View On <strong>GitHub</strong></a></li>
-        </ul>
-
+        <p>Use this graphic to follow along with the "simple example" in the <a href="https://github.com/brews/lookupjs/wiki/Tutorial">lookup tutorial<a>.</p>
       </header>
       <section>
         <h1>
-<a name="lookup" class="anchor" href="#lookup"><span class="octicon octicon-link"></span></a>Salt River Project: Rank percentiles - Full</h1>
-      </section>
-      <section>
-        <p>This is lookup for the Salt River Project.</p>
-        <p>Data is in units of ranked percentiles. This percentile is calculated using the full record length for each series. An exception to this is the ONI, which is in its original index units. The data used in the plot is described below.</p>
+<a name="lookup" class="anchor" href="#lookup"><span class="octicon octicon-link"></span></a>Simple example</h1>
       </section>
       <section>
         <div id="container">
           <div id="timeline-chart", class="charts">
-            <div class="title">timeline</div>
+            <div class="title"><b>(time series plot)</b></div>
           </div>
           <div id="filter-chart", class="charts">
-            <div class="title">filter</div>
+            <div class="title"><b>(filter plot)</b></div>
           </div>
           <div id="yearhist-chart", class="charts">
-            <div class="title">single-year histogram</div>
+            <div class="title"><b>(histogram plot)</b></div>
           </div>
         </div>
       </section>
-      <section>
-        <p>"STVpcip" is Salt-Tonto-Verde watershed average precipitation from Dec-Mar. Data is from 2014-06-19 personal communication with Jonathan Skindlov.</p>
-        <p>"Reservoir" is the total inflow to SRP reservoirs from Dec-May. Data is from 2014-06-19 personal communication with Jonathan Skindlov.</p>
-        <p>"LeesFerry" is the total naturalized water-year flow of the Colorado River at Lee's Ferry. Data was downloaded from <a href="http://www.usbr.gov/lc/region/g4000/NaturalFlow/current.html">USBR</a> on 2014-07-02.</p>
-        <p>"ONI" is the Dec-Feb Oceanic Niño Index. Data was downloaded from <a href="http://www.esrl.noaa.gov/psd/data/climateindices/list/">NOAA</a> on 2014-07-02.</p>
-      </section>
-      <footer>
-        <p>This project is maintained by <a href="https://github.com/brews">brews</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Modified from theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
-      </footer>
     </div>
     <script src="javascripts/scale.fix.js"></script>
     <script src="javascripts/d3.v3.min.js", type="text/javascript"></script>
     <script src="javascripts/lookup.js" type="text/javascript"></script>
-    <script type="text/javascript">
-      var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
-      document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
-    </script>
-    <script type="text/javascript">
-      try {
-        var pageTracker = _gat._getTracker("UA-42669371-1");
-        pageTracker._trackPageview();
-      } catch(err) {}
-    </script>
     <script type="text/javascript">
 
     var test = new Engine(3);
@@ -179,23 +130,23 @@
 
 
     test.setSeriesPlotWidth(360);
-    test.setSeriesPlotHeight(350);
+    test.setSeriesPlotHeight(200);
     test.setSeriesPlotTicks(5);
     test.setSeriesPlotPadding(20);
     test.setSeriesPlotMargin({top: 20, right: 50, bottom: 20, left: 125});
 
     test.setFilterPlotWidth(75);
-    test.setFilterPlotHeight(350);
+    test.setFilterPlotHeight(200);
     test.setFilterPlotPadding(20);
     test.setFilterPlotMargin({top: 20, right: 50, bottom: 20, left: 125});
 
     test.setHistPlotWidth(75);
-    test.setHistPlotHeight(350);
+    test.setHistPlotHeight(200);
     test.setHistPlotPadding(20);
     test.setHistPlotMargin({top: 20, right: 50, bottom: 20, left: 125});
 
 
-    d3.csv("plotdata/srpprankfull.json", function(error, data) {
+    d3.csv("plotdata/tutorial_simpleexample.json", function(error, data) {
        // TODO: Still need some error catching here.
        if (error) {
            console.log(error);
@@ -215,7 +166,7 @@
               dataset[index] = outgoing;
            });
        // console.log(dataset); // DEBUG
-       test.setData(dataset, "WY");
+       test.setData(dataset, "Year");
        test.setSeriesPlotId("#timeline-chart");
        test.setFilterPlotId("#filter-chart");
        test.setHistPlotId("#yearhist-chart");
@@ -223,6 +174,7 @@
        test.drawPlots();
        }
     });
-      </script>
+
+    </script>
   </body>
 </html>
