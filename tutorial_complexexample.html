@@ -1,0 +1,183 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>more complex example - lookup tutorial</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <link rel="stylesheet" href="stylesheets/chart_styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link rel="icon" type="image/png" href="/favicon-96x96.png" sizes="96x96">
+    <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16">
+    <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32">
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <p>Use this graphic to follow along with the "more complex example" in the <a href="https://github.com/brews/lookupjs/wiki/Tutorial">lookup tutorial<a>.</p>
+      </header>
+      <section>
+        <h1>
+<a name="lookup" class="anchor" href="#lookup"><span class="octicon octicon-link"></span></a>More complex example</h1>
+      </section>
+      <section>
+        <div id="container">
+          <div id="timeline-chart", class="charts">
+            <div class="title"><b></b></div>
+          </div>
+          <div id="filter-chart", class="charts">
+            <div class="title"><b></b></div>
+          </div>
+          <div id="yearhist-chart", class="charts">
+            <div class="title"><b></b></div>
+          </div>
+        </div>
+      </section>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    <script src="javascripts/d3.v3.min.js", type="text/javascript"></script>
+    <script src="javascripts/lookup.js" type="text/javascript"></script>
+    <script type="text/javascript">
+
+    var test = new Engine(3);
+    var dataset = [];
+
+    function zoomer(d) {
+      // Called when zoom events are triggered. Transitions if zoom, not if panned.
+      // TODO: This is very poorly done. It would be great to clean it up and
+      //       get this functionality into lookup.js.
+      var k_time = test.time_key;
+      var xScale = test.seriesPlotXScale;
+      var durationtime = 400;
+      var t = d3.event.translate;
+      var s = d3.event.scale;
+      test.zoom.translate(t);
+      if (s == test.previousScale) {
+          test.seriesPlotSvg.select("#timelineplotspace")
+              .select(".axis.x")
+              .call(test.seriesPlotXAxis);
+          for (var i in test.var_keys) {
+              var k = test.var_keys[i];
+              var kScale = test.seriesPlotYScales[k];
+              test.seriesPlotLines[k] = d3.svg.line()
+                  .defined(function(d) { return d[k] != null; })  // Avoid `null` values.
+                  .x(function(d) { return xScale(d[k_time]); })
+                  .y(function(d) { return kScale(d[k]); });
+              test.seriesPlotSvg.selectAll(".lineplotcircle")
+                  .attr("cx", function(d) { return xScale(d[k_time]); });
+              test.seriesPlotSvg.select(".lineplotpath." + k)
+                  .attr("d", test.seriesPlotLines[k](test.dataset));
+          }
+      } else {
+          test.seriesPlotSvg.select("#timelineplotspace")
+              .select(".axis.x")
+              .transition()
+              .duration(durationtime)
+              .call(test.seriesPlotXAxis);
+          for (var i in test.var_keys) {
+              var k = test.var_keys[i];
+              var kScale = test.seriesPlotYScales[k];
+              test.seriesPlotLines[k] = d3.svg.line()
+                  .defined(function(d) { return d[k] != null; })  // Avoid `null` values.
+                  .x(function(d) { return xScale(d[k_time]); })
+                  .y(function(d) { return kScale(d[k]); });
+              test.seriesPlotSvg.selectAll(".lineplotcircle")
+                  .transition()
+                  .duration(durationtime)
+                  .attr("cx", function(d) { return xScale(d[k_time]); });
+              test.seriesPlotSvg.select(".lineplotpath." + k)
+                  .transition()
+                  .duration(durationtime)
+                  .attr("d", test.seriesPlotLines[k](test.dataset));
+          }
+      }
+      test.previousScale = s;
+    }
+
+    function dragger(d) {
+      // Called whenever drag events are fired. Intended to work on filterSvg circles.
+      var classpool = d3.select(this).attr("class").split(" ");
+      // Find the series (`s`) and position (`p`; "high" or "low") being referenced.
+      var s = classpool.filter(function(e, i, a) { return test.var_keys.indexOf(e) != -1; })[0];
+      var p = classpool.filter(function(e, i, a) { return ["high", "low"].indexOf(e) != -1; })[0];
+      var v = test.seriesPlotYScales[s].invert(parseFloat(d3.event.y));
+      if (p == "high") {
+          test.setHighFilter(v, s, d.filterYear);
+      } else if (p == "low") {
+          test.setLowFilter(v, s, d.filterYear);
+      } else {
+          alert("Something went wrong with filter dragging.");
+      }
+      d3.select(this)
+          .attr("cy", function(d) {
+              return test.seriesPlotYScales[s](d[s][p]);
+          })
+          .select("title")
+          .text(function(d) {
+              return d[s][p] + " (" + d["filterYear"] + ")";
+          });
+      d3.select(".filterplotline." + s + "." + "fy" + d.filterYear)
+          .attr("y1", function(d) {
+              return test.seriesPlotYScales[s](d[s].low);
+          })
+          .attr("y2", function(d) {
+              return test.seriesPlotYScales[s](d[s].high);
+          });
+      test.refilter();
+    }
+
+
+    test.setSeriesPlotWidth(360);
+    test.setSeriesPlotHeight(350);
+    test.setSeriesPlotTicks(5);
+    test.setSeriesPlotPadding(20);
+    test.setSeriesPlotMargin({top: 20, right: 50, bottom: 20, left: 125});
+
+    test.setFilterPlotWidth(75);
+    test.setFilterPlotHeight(350);
+    test.setFilterPlotPadding(20);
+    test.setFilterPlotMargin({top: 20, right: 50, bottom: 20, left: 125});
+
+    test.setHistPlotWidth(75);
+    test.setHistPlotHeight(350);
+    test.setHistPlotPadding(20);
+    test.setHistPlotMargin({top: 20, right: 50, bottom: 20, left: 125});
+
+
+    d3.csv("plotdata/tutorial_complexexample.json", function(error, data) {
+       // TODO: Still need some error catching here.
+       if (error) {
+           console.log(error);
+       } else {
+           data.forEach(function(d, index) {
+              // Convert strings to numbers and assign to `dataset`.
+              var dkeys = d3.keys(d);
+              var outgoing = {};
+              for (var i = 0; i < dkeys.length; i++) {
+                  if (d[dkeys[i]] === "") {  // DEBUG
+                      // console.log("should be null")
+                      outgoing[dkeys[i]] = null;  // Maybe `undefined` instead of `null`.
+                  } else {
+                      outgoing[dkeys[i]] = +d[dkeys[i]];
+                  }
+              }
+              dataset[index] = outgoing;
+           });
+       // console.log(dataset); // DEBUG
+       test.setData(dataset, "WY");
+       test.setSeriesPlotId("#timeline-chart");
+       test.setFilterPlotId("#filter-chart");
+       test.setHistPlotId("#yearhist-chart");
+
+       test.drawPlots();
+       }
+    });
+
+    </script>
+  </body>
+</html>
