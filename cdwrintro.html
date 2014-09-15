@@ -48,34 +48,25 @@
       </header>
       <section>
         <h1>
-<a name="lookup" class="anchor" href="#lookup"><span class="octicon octicon-link"></span></a>Salt-Tonto-Verde & Colorado River>> Rank percentile (Crop)</h1>
+<a name="lookup" class="anchor" href="#lookup"><span class="octicon octicon-link"></span></a>Sacramento & Colorado River series</h1>
       </section>
       <section>
-        <p>This is lookup for the Salt River Project.</p>
-        <p>All data is cropped to have matching series length from 1950 to 2010. Data is in units of ranked percentiles. This percentile is calculated using the full record length for each series. An exception to this is the ONI, which is in its original index units. The data used in the plot is described below.</p>
-      </section>
-      <section>
-        <div id="container">
-          <div id="timeline-chart", class="charts">
-            <div class="title">timeline</div>
-          </div>
-          <div id="filter-chart", class="charts">
-            <div class="title">filter</div>
-          </div>
-          <div id="yearhist-chart", class="charts">
-            <div class="title">single-year histogram</div>
-          </div>
-        </div>
-      </section>
-      <section>
-        <p>"STVpcip" is Salt-Tonto-Verde watershed average precipitation from Dec-Mar. Data is from 2014-06-19 personal communication with Jonathan Skindlov.</p>
-        <p>"Reservoir" is the total inflow to SRP reservoirs from Dec-May. Data is from 2014-06-19 personal communication with Jonathan Skindlov.</p>
-        <p>"LeesFerry" is the total naturalized water-year flow of the Colorado River at Lee's Ferry. Data was downloaded from <a href="http://www.usbr.gov/lc/region/g4000/NaturalFlow/current.html">USBR</a> on 2014-07-02.</p>
-        <p>"ONI" is the Dec-Feb Oceanic Niño Index. Negative values can be considered cold events in the Equatorial Pacific and positive values can be considered warm events. Data was downloaded from <a href="http://www.esrl.noaa.gov/psd/data/climateindices/list/">NOAA</a> on 2014-07-02.</p>
+        <p>If you are new to lookup, before you begin you may want to take a look at our <a href="https:// github.com/brews/lookupjs/wiki/Tutorial">tutorial</a> to get things started.</p>
+        <p>There are four versions of lookup that target Sacramento and Colorado River (Lee's Ferry) streamflow. Two of these use data from the instrumental record and two use data from the paleo record.</p>
+        <p>Instrumental record:</p>
+        <p><a href="cdwrinstnpac.html">>> Aleutian low</a><br>
+        Focuses on patterns between the Sacramento and Colorado River, North Pacific Index anomalies (NPI; <a href="http://dx.doi.org/10.1007/BF00204745">Trenberth and Hurrell 1994</a>), and the Aleutian Low Pressure Index (ALPI; <a href="http://dx.doi.org/10.1139/f96-310">Beamish et al. 1997</a>).</p>
+        <p><a href="cdwrinsteqpac.html">>> ENSO</a><br>
+        Focuses on patterns between the Sacramento and Colorado River, the March-May bivariate ENSO index, and the December-February bivariate ENSO index (<a href="http://dx.doi.org/10.1002/1097-0088(20001115)20:13<1543::AID-JOC579>3.0.CO;2-A">Smith and Sardeshmukh 2000</a>).</p>
+        <p>Paleo record:</p>
+        <p><a href="cdwrpaleonpac.html">>> Paleo Aleutian low</a><br>
+        Focuses on patterns between tree-ring reconstructions of the Sacramento and Colorado River (<a href="http://dx.doi.org/10.1111/j.1752-1688.2001.tb05530.x">Meko et al. 2001</a>; <a href="http://dx.doi.org/10.1029/2007GL029988">Meko et al. 2007</a>), and reconstructions of coastal surface air temperature in the Gulf of Alaska (as proxy for the Aleutian low; <a href="http://dx.doi.org/10.1007/s00382-006-0194-9">Wilson et al. 2007</a>).</p>
+        <p><a href="cdwrpaleoeqpac.html">>> Paleo ENSO</a><br>
+        Focuses on patterns between tree-ring reconstructions of the Sacramento and Colorado River (<a href="http://dx.doi.org/10.1111/j.1752-1688.2001.tb05530.x">Meko et al. 2001</a>; <a href="http://dx.doi.org/10.1029/2007GL029988">Meko et al. 2007</a>), and reconstructions of Equatorial Pacific sea-surface temperature anomalies (<a href="http://en.wikipedia.org/wiki/El_Ni%C3%B1o_Southern_Oscillation">ENSO</a> <a href="http://www.ncdc.noaa.gov/teleconnections/enso/indicators/sst.php">Niño 3.4 Index</a>; <a href="http://dx.doi.org/10.1038/nclimate1936">Li et al. 2013</a>).</p>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/brews">brews</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Modified from theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
       </footer>
     </div>
     <script src="javascripts/scale.fix.js"></script>
@@ -198,7 +189,7 @@
     test.setHistPlotMargin({top: 20, right: 50, bottom: 20, left: 125});
 
 
-    d3.csv("plotdata/srpprankcrop.json", function(error, data) {
+    d3.csv("plotdata/cdwrdemoP.json", function(error, data) {
        // TODO: Still need some error catching here.
        if (error) {
            console.log(error);
@@ -218,7 +209,7 @@
               dataset[index] = outgoing;
            });
        // console.log(dataset); // DEBUG
-       test.setData(dataset, "WY");
+       test.setData(dataset, "Year");
        test.setSeriesPlotId("#timeline-chart");
        test.setFilterPlotId("#filter-chart");
        test.setHistPlotId("#yearhist-chart");

@@ -48,34 +48,22 @@
       </header>
       <section>
         <h1>
-<a name="lookup" class="anchor" href="#lookup"><span class="octicon octicon-link"></span></a>Salt-Tonto-Verde & Colorado River>> Rank percentile (Crop)</h1>
+<a name="lookup" class="anchor" href="#lookup"><span class="octicon octicon-link"></span></a>Salt-Tonto-Verde & Colorado River series</h1>
       </section>
       <section>
-        <p>This is lookup for the Salt River Project.</p>
-        <p>All data is cropped to have matching series length from 1950 to 2010. Data is in units of ranked percentiles. This percentile is calculated using the full record length for each series. An exception to this is the ONI, which is in its original index units. The data used in the plot is described below.</p>
-      </section>
-      <section>
-        <div id="container">
-          <div id="timeline-chart", class="charts">
-            <div class="title">timeline</div>
-          </div>
-          <div id="filter-chart", class="charts">
-            <div class="title">filter</div>
-          </div>
-          <div id="yearhist-chart", class="charts">
-            <div class="title">single-year histogram</div>
-          </div>
-        </div>
-      </section>
-      <section>
-        <p>"STVpcip" is Salt-Tonto-Verde watershed average precipitation from Dec-Mar. Data is from 2014-06-19 personal communication with Jonathan Skindlov.</p>
-        <p>"Reservoir" is the total inflow to SRP reservoirs from Dec-May. Data is from 2014-06-19 personal communication with Jonathan Skindlov.</p>
-        <p>"LeesFerry" is the total naturalized water-year flow of the Colorado River at Lee's Ferry. Data was downloaded from <a href="http://www.usbr.gov/lc/region/g4000/NaturalFlow/current.html">USBR</a> on 2014-07-02.</p>
-        <p>"ONI" is the Dec-Feb Oceanic Niño Index. Negative values can be considered cold events in the Equatorial Pacific and positive values can be considered warm events. Data was downloaded from <a href="http://www.esrl.noaa.gov/psd/data/climateindices/list/">NOAA</a> on 2014-07-02.</p>
+        <p>If you are new to lookup, before you begin you may want to take a look at our <a href="https:// github.com/brews/lookupjs/wiki/Tutorial">tutorial</a> to get things started.</p>
+        <p>There are several draft versions of lookup that target hydroclimate data from the Salt-Tonto-Verde and Colorado River (Lee's Ferry) streamflow.</p>
+        <p>All versions include December-March Salt-Tonto-Verde watershed precipitation, SRP Reservoir levels, Colorado River streamflow at Lee's Ferry, and the Dec-Feb Oceanic Niño Index (ONI). Each version has the data transformed in a different way and each is available with a full dataset or data cropped to a common period.</p>
+        <p>>> Raw data<br>
+        Untransformed. Available <a href="srprawcrop.html">cropped</a> to a common period or with <a href="srprawfull.html">full</a> datasets.</p>
+        <p>>> Rank percentiles<br>
+        Data is in units of ranked percentiles. This percentile is calculated using the full record length for each series. An exception to this is the ONI, which is in its original index units. Available <a href="srpprankcrop.html">cropped</a> to a common period or with <a href="srpprankfull.html">full</a> datasets.</p>
+        <p>>> Percent of mean<br>
+        Data is in units of percent mean. This mean is calculated using the full record length for each series. An exception to this is the ONI, which is in its original index units. Available <a href="srppmeancrop.html">cropped</a> to a common period or with <a href="srppmeanfull.html">full</a> datasets.</p>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/brews">brews</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Modified from theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
       </footer>
     </div>
     <script src="javascripts/scale.fix.js"></script>
@@ -198,7 +186,7 @@
     test.setHistPlotMargin({top: 20, right: 50, bottom: 20, left: 125});
 
 
-    d3.csv("plotdata/srpprankcrop.json", function(error, data) {
+    d3.csv("plotdata/cdwrdemoP.json", function(error, data) {
        // TODO: Still need some error catching here.
        if (error) {
            console.log(error);
@@ -218,7 +206,7 @@
               dataset[index] = outgoing;
            });
        // console.log(dataset); // DEBUG
-       test.setData(dataset, "WY");
+       test.setData(dataset, "Year");
        test.setSeriesPlotId("#timeline-chart");
        test.setFilterPlotId("#filter-chart");
        test.setHistPlotId("#yearhist-chart");
