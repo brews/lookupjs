@@ -48,10 +48,10 @@
       </header>
       <section>
         <h1>
-<a name="lookup" class="anchor" href="#lookup"><span class="octicon octicon-link"></span></a>Sacramento & Colorado River>> Paleo ENSO</h1>
+<a name="lookup" class="anchor" href="#lookup"><span class="octicon octicon-link"></span></a>Sacramento & Colorado River>> semi-permanent western US high</h1>
       </section>
       <section>
-        <p>This version of lookup focuses on patterns between paleo-reconstructions of the Sacramento River ("Sacramento"), the Colorado River ("LeesFerry"), and coastal surface air temperature in the Gulf of Alaska ("GOA").</p>
+        <p>This version of lookup focuses on patterns between the Sacramento River ("Sacramento"), the Colorado River ("LeesFerry"), the wintertime latitude of the seasonal Rocky High ("HighLat"), and the relative intensity of the wintertime Rocky High ("HighValue").</p>
         <p>The data is described in detail below.</p>
       </section>
       <section>
@@ -68,16 +68,17 @@
         </div>
       </section>
       <section>
-        <p>"Sacramento" is a tree-ring reconstructed time series of <a href="http://en.wikipedia.org/wiki/Sacramento_River">Sacramento River</a> <a href="http://water.usgs.gov/nwc/explain_data.html">water year</a> natural streamflow (<a href="http://dx.doi.org/10.1111/j.1752-1688.2001.tb05530.x">Meko et al. 2001</a>). The data has been transformed into rank-percentiles. See <a href="http://treeflow.info/cali/sacramentofour.html">here</a> for further discussion.</p>
+        <p>"Sacramento" is a <a href="http://water.usgs.gov/nwc/explain_data.html">water year</a> time series of unimpaired runoff, or full natural flow, for the <a href="http://en.wikipedia.org/wiki/Sacramento_River">Sacramento River</a>. The data has been transformed into rank-percentiles. The series is the sum of natural flow from four river gauges: <a href="http://cdec.water.ca.gov/cgi-progs/staMeta?station_id=BND">Sacramento River at Bend Bridge</a>, <a href="http://cdec.water.ca.gov/cgi-progs/staMeta?station_id=FTO">Feather River at Oroville</a>, <a href="http://cdec.water.ca.gov/cgi-progs/staMeta?station_id=YRS">Yuba River near Smartville</a>, and <a href="http://cdec.water.ca.gov/cgi-progs/staMeta?station_id=AMF">American River at Folsom Lake</a>. This index is also known as the "Four River Index" or "Four Basin Index".</p>
 
-        <p>"LeesFerry" is a tree-ring reconstructed time series of  <a href="http://water.usgs.gov/nwc/explain_data.html">water year</a> <a href="http://en.wikipedia.org/wiki/Colorado_River">Colorado River</a> natural streamflow at Lee's Ferry (<a href="http://dx.doi.org/10.1029/2007GL029988">Meko et al. 2007</a>). The data has been transformed into rank-percentiles. See <a href="http://treeflow.info/upco/coloradoleesmeko.html">here</a> for further discussion.</p>
+        <p>"LeesFerry" is a <a href="http://water.usgs.gov/nwc/explain_data.html">water year</a> time series of  natural flow for the <a href="http://en.wikipedia.org/wiki/Colorado_River">Colorado River</a>. The data has been transformed into rank-percentiles. The data is calculated from the Lee's Ferry river gauge. This gauge measures the Colorado River streamflow from the Upper Colorado River basin. <a href="http://www.usbr.gov/lc/region/g4000/NaturalFlow/documentation.html">Source</a>.</p>
 
-        <p>"GOA" is tree-ring reconstructed coastal surface temperatures from the Gulf of Alaska (<a href="http://dx.doi.org/10.1007/s00382-006-0194-9">Wilson et al. 2007</a>). The data has been transformed into rank-percentiles.</p>
+        <p>"HighLat" is latitude of the center for the semi-permanent high-pressure atmosphere circulation feature over the North American Cordillera from November through April at 500 mb geopoential height. This value is estimated from a method described in <a href="https://ams.confex.com/ams/94Annual/webprogram/Paper237010.html">Malevich and Woodhouse 2014</a> using <a href="http://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis.html">NCEP/NCAR reanalysis</a> data.</p>
+
+        <p>"HighValue" is the estimated intensity or magnitude (in units m geopotential height) of the center for the semi-permanent high-pressure atmosphere circulation feature over the North American Cordillera from November through April at 500 mb geopoential height. The value is an anomaly from the 500 mb geopotential height field with the zonal mean removed from the data. This value is estimated from a method described in <a href="https://ams.confex.com/ams/94Annual/webprogram/Paper237010.html">Malevich and Woodhouse 2014</a> using <a href="http://www.esrl.noaa.gov/psd/data/gridded/data.ncep.reanalysis.html">NCEP/NCAR reanalysis</a> data.</p>
       </section>
       <footer>
         <p>This project is maintained by <a href="https://github.com/brews">brews</a></p>
       </footer>
-
     </div>
     <script src="javascripts/scale.fix.js"></script>
     <script src="javascripts/d3.v3.min.js", type="text/javascript"></script>
@@ -199,7 +200,7 @@
     test.setHistPlotMargin({top: 20, right: 50, bottom: 20, left: 125});
 
 
-    d3.csv("plotdata/cdwrpaleogoa.json", function(error, data) {
+    d3.csv("plotdata/cdwrinstwi.json", function(error, data) {
        // TODO: Still need some error catching here.
        if (error) {
            console.log(error);
