@@ -368,8 +368,8 @@ Engine.prototype = {
     
     initHistPlotBins: function(m) {
         // Refresh the single year histogram given `m`, an array, like 
-        //`this.dataset`, which has an object for each target
-        // -not matched- year.
+        //`this.dataset`, which has an object for each match
+        // -not target- year.
         m =  typeof m !== 'undefined' ? m : this.dataset;
         this.histPlotBins = {};
         for (i in this.var_keys) {
@@ -382,8 +382,8 @@ Engine.prototype = {
 
     refreshHistPlotBins: function(m) {
         // Refresh the single year histogram bins given `m`, an array, like 
-        //`this.dataset`, which has an object for each target
-        // -not matched- year. This also resets the histPlot scales and axis.
+        //`this.dataset`, which has an object for each match
+        // -not target- year. This also resets the histPlot scales and axis.
         this.initHistPlotBins(m);
         var maxNo = d3.max(this.histPlotBins[this.var_keys[0]].map(function(d) { return d.y; }));
         for (i in this.var_keys) {
@@ -506,7 +506,7 @@ Engine.prototype = {
         var out = [];
         var i;
         for (i = 0; i < this.dataset.length; i += 1) {
-            if (matches.indexOf(this.dataset[i][this.time_key]) !== -1) {
+            if (matches.indexOf(this.dataset[i][this.time_key] - this.matchLag) !== -1) {
                 out.push(this.dataset[i]);
             }
         }
