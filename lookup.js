@@ -411,8 +411,9 @@ Engine.prototype = {
 
     refilter: function() {
         // Rerun the lookup filter engine and refresh plots as needed.
+        var k_time = this.time_key;
         var matched = this.getMatchArray();
-        this.highlight(matched.map(function(d) { return d.Year; }));
+        this.highlight(matched.map(function(d) { return d[k_time]; }));
         this.refreshHistPlotBins(matched);
     },
 
@@ -505,7 +506,7 @@ Engine.prototype = {
         var out = [];
         var i;
         for (i = 0; i < this.dataset.length; i += 1) {
-            if (matches.indexOf(this.dataset[i].Year - this.matchLag) !== -1) {
+            if (matches.indexOf(this.dataset[i][this.time_key]) !== -1) {
                 out.push(this.dataset[i]);
             }
         }
@@ -515,6 +516,7 @@ Engine.prototype = {
     filter: function(filters, firstrun, candidates) {
         // Filter the dataset based on this.filters. Returns an array of the 
         // single years following the matched pattern.
+        var k_time = this.time_key;
         firstrun =  typeof firstrun !== 'undefined' ? firstrun : true;
         candidates =  typeof candidates !== 'undefined' ? candidates : [];
         if (firstrun) {
@@ -525,7 +527,7 @@ Engine.prototype = {
             var final = [];
             var i;
             for (i = 0; i < candidates.length; i += 1) {
-                final.push(this.dataset[candidates[i]].Year);
+                final.push(this.dataset[candidates[i]][k_time]);
             }
             return final;
         }
@@ -549,7 +551,7 @@ Engine.prototype = {
         }
         return this.filter(filters = filters, firstrun = false, candidates = good_match);
     },
-
+    
     setHighFilter: function(x, series, year) {
         // Set the high value of a filter given value `x`, the series key and the `filterYear`.
 
