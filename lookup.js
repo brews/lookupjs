@@ -75,6 +75,7 @@ function Engine(n) {
     this.seriesPlotDimensions.circleRadius = 4;
     this.zoomExtent = [1, 8];
     this.previousScale = 1;
+    this.matchLag = 0;  // Match is year after pattern by default. Must be int.
     this.drag = d3.behavior.drag()
         .on("drag", dragger);
     this.zoom = d3.behavior.zoom()
@@ -504,7 +505,7 @@ Engine.prototype = {
         var out = [];
         var i;
         for (i = 0; i < this.dataset.length; i += 1) {
-            if (matches.indexOf(this.dataset[i].Year) !== -1) {
+            if (matches.indexOf(this.dataset[i].Year - this.matchLag) !== -1) {
                 out.push(this.dataset[i]);
             }
         }
