@@ -72,6 +72,7 @@ function Engine(n) {
     this.seriesPlotYScales = {};
     this.seriesPlotYAxis = {};
     this.seriesPlotTicks = 5;
+    this.histPlotXTicks = 4;
     this.seriesPlotDimensions.circleRadius = 4;
     this.zoomExtent = [1, 8];
     this.previousScale = 1;
@@ -463,6 +464,7 @@ Engine.prototype = {
         this.histPlotXAxis = d3.svg.axis();
         this.histPlotXAxis.scale(this.histPlotXScale)
             .orient("bottom")
+            .ticks(this.histPlotXTicks)
             .tickFormat(d3.format("d"));
     },
 
@@ -490,7 +492,7 @@ Engine.prototype = {
         this.histPlotXScale = d3.scale.linear();
         this.histPlotXScale.domain([0, this.dataset.length])
             .range([0, this.histPlotDimensions.width])
-            .nice();
+            .nice(this.histPlotXTicks);
     },
 
     getFilterLength: function() {
@@ -630,7 +632,7 @@ Engine.prototype = {
         this.histPlotDimensions.width = x - this.histPlotDimensions.margin.left - this.histPlotDimensions.margin.right;
     },
 
-    setHistPlotTicks: function(x) {
-        this.histPlotTicks = x;
+    setHistPlotXTicks: function(x) {
+        this.histPlotXTicks = x;
     },
 };
