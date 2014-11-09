@@ -561,9 +561,20 @@ Engine.prototype = {
         // single function and add logic that ensures the high and low values 
         // stay within the data's range and that `high` cannot be lower than 
         // `low`, etc...
+        var maxpos = this.seriesPlotYScales[series].domain()[1]
+        var minpos = this.seriesPlotYScales[series].domain()[0]
+        if (x > maxpos) {
+            x = maxpos;
+        } else if (x < minpos) {
+            x = minpos;
+        }
+
         var i;
         for (i = 0; i < this.filters.length; i += 1) {
             if (this.filters[i].filterYear == year) {
+                if (x <= this.filters[i][series].low) {
+                    x = this.filters[i][series].low;
+                }
                 this.filters[i][series].high = x;
             }
         }
@@ -576,10 +587,20 @@ Engine.prototype = {
         // single function and add logic that ensures the high and low values 
         // stay within the data's range and that `high` cannot be lower than 
         // `low`, etc...
+        var maxpos = this.seriesPlotYScales[series].domain()[1]
+        var minpos = this.seriesPlotYScales[series].domain()[0]
+        if (x > maxpos) {
+            x = maxpos;
+        } else if (x < minpos) {
+            x = minpos;
+        }
 
         var i;
         for (i = 0; i < this.filters.length; i += 1) {
             if (this.filters[i].filterYear === year) {
+                if (x >= this.filters[i][series].high) {
+                    x = this.filters[i][series].high;
+                }
                 this.filters[i][series].low = x;
             }
         }
