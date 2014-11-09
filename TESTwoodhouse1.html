@@ -91,6 +91,17 @@
     var test = new Engine(3);
     var dataset = [];
 
+    function snapper(x, res) {
+        rem = x%res;
+        out = x;
+        if (rem >= res/2) {
+            out += (res - rem);
+        } else if (rem <= res/2) {
+            out -= rem
+        }
+        return out;
+    }
+
     function zoomer(d) {
       // Called when zoom events are triggered. Transitions if zoom, not if panned.
       // TODO: This is very poorly done. It would be great to clean it up and
@@ -150,6 +161,7 @@
       var s = classpool.filter(function(e, i, a) { return test.var_keys.indexOf(e) != -1; })[0];
       var p = classpool.filter(function(e, i, a) { return ["high", "low"].indexOf(e) != -1; })[0];
       var v = test.seriesPlotYScales[s].invert(parseFloat(d3.event.y));
+      v = snapper(v, 0.05);
       if (p == "high") {
           test.setHighFilter(v, s, d.filterYear);
       } else if (p == "low") {
